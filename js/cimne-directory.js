@@ -74,6 +74,18 @@
         }
 
         var selectedOption = select.options[select.selectedIndex];
+        var filterType = selectedOption ? selectedOption.dataset.filterType : '';
+
+        if ('psr-department' === filterType) {
+            var departmentCode = selectedOption
+                ? String(selectedOption.dataset.departmentCode || '').trim()
+                : '';
+
+            return '1' === card.dataset.isPsr
+                && departmentCode !== ''
+                && String(card.dataset.departmentCode || '').trim() === departmentCode;
+        }
+
         var filterCodes = splitCodes(selectedOption ? selectedOption.dataset.unitCodes : '');
         var personCodes = splitCodes(card.dataset.unitCodes || '');
 

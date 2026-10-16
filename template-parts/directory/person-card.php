@@ -27,6 +27,8 @@ $display_roles = isset( $person['display_roles'] ) && is_array( $person['display
     ? $person['display_roles']
     : array();
 $centre     = isset( $person['centre_code'] ) ? trim( (string) $person['centre_code'] ) : '';
+$department_code = isset( $person['department_code'] ) ? trim( (string) $person['department_code'] ) : '';
+$department_name = isset( $person['department_name'] ) ? trim( (string) $person['department_name'] ) : '';
 $is_psr     = ! empty( $person['is_psr'] );
 $is_pdi     = ! empty( $person['is_pdi'] );
 $unit_codes = isset( $person['unit_codes'] ) && is_array( $person['unit_codes'] )
@@ -40,7 +42,7 @@ if ( '' === $full_name ) {
     return;
 }
 
-$search_parts = array( $full_name, $email, $category );
+$search_parts = array( $full_name, $email, $category, $department_name );
 
 foreach ( $display_roles as $display_role ) {
     if ( ! is_array( $display_role ) ) {
@@ -83,6 +85,7 @@ $email_id = cimne_directory_email_element_id( $email );
     data-person-id="<?php echo esc_attr( (string) $person_id ); ?>"
     data-search-text="<?php echo esc_attr( $search_text ); ?>"
     data-centre-code="<?php echo esc_attr( $centre ); ?>"
+    data-department-code="<?php echo esc_attr( $department_code ); ?>"
     data-is-psr="<?php echo $is_psr ? '1' : '0'; ?>"
     data-is-pdi="<?php echo $is_pdi ? '1' : '0'; ?>"
     data-unit-codes="<?php echo esc_attr( implode( ',', $unit_codes ) ); ?>"

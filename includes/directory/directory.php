@@ -20,7 +20,7 @@ function cimne_directory_get_people() {
         'directorio',
         array(),
         array(
-            'cache_variant' => 'directory-list-v5',
+            'cache_variant' => 'directory-list-v6',
             'transform'     => 'cimne_normalize_directory_payload',
         )
     );

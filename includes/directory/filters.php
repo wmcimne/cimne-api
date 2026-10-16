@@ -21,37 +21,113 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @return string[]
  */
 function cimne_directory_units_without_group_options() {
-    return array( 'RC8', 'IU1', 'IU2' );
+    return array( 'RC8', 'IU1', 'IU2', 'IU3' );
 }
 
 
 /**
- * Returns the hardcoded CIMNE office locations used by the Directory filter.
+ * Builds the Location selector options from the normalized /directorio dataset.
  *
- * The API code is the stable filter key; the visible label is translated via
- * gettext even though the current city names are identical across languages.
+ * centro_cod is used as the stable key and centro_desc as the visible label.
+ * Empty/incomplete pairs are ignored. No location is hardcoded in the theme.
  *
+ * @param array|null $people Optional normalized Directory dataset.
  * @return array<int,array{code:string,label:string}>
  */
-function cimne_directory_get_locations() {
-    return array(
-        array(
-            'code'  => '04',
-            'label' => __( 'Lleida', 'cimne' ),
-        ),
-        array(
-            'code'  => '02',
-            'label' => __( 'Barcelona', 'cimne' ),
-        ),
-        array(
-            'code'  => '03',
-            'label' => __( 'Terrassa', 'cimne' ),
-        ),
-        array(
-            'code'  => '05',
-            'label' => __( 'Madrid', 'cimne' ),
-        ),
+function cimne_directory_get_locations( $people = null ) {
+    if ( null === $people ) {
+        $people = cimne_directory_get_people();
+    }
+
+    if ( is_wp_error( $people ) || ! is_array( $people ) ) {
+        return array();
+    }
+
+    $by_code = array();
+
+    foreach ( $people as $person ) {
+        if ( ! is_array( $person ) ) {
+            continue;
+        }
+
+        $code = isset( $person['centre_code'] ) ? trim( (string) $person['centre_code'] ) : '';
+        $label = isset( $person['centre_name'] ) ? trim( (string) $person['centre_name'] ) : '';
+
+        if ( '' === $code || '' === $label ) {
+            continue;
+        }
+
+        if ( ! isset( $by_code[ $code ] ) ) {
+            $by_code[ $code ] = array(
+                'code'  => $code,
+                'label' => $label,
+            );
+        }
+    }
+
+    $locations = array_values( $by_code );
+
+    usort(
+        $locations,
+        static function ( $a, $b ) {
+            return strcasecmp( (string) $a['label'], (string) $b['label'] );
+        }
     );
+
+    return $locations;
+}
+
+/**
+ * Builds the PSR child departments from /directorio.
+ *
+ * Only people with esPSR=1 contribute options. departamento_cod is the stable
+ * key and departamento_desc is the public label. The PSR parent itself remains
+ * available to show all PSR staff regardless of department.
+ *
+ * @param array|null $people Optional normalized Directory dataset.
+ * @return array<int,array{code:string,label:string}>
+ */
+function cimne_directory_get_psr_departments( $people = null ) {
+    if ( null === $people ) {
+        $people = cimne_directory_get_people();
+    }
+
+    if ( is_wp_error( $people ) || ! is_array( $people ) ) {
+        return array();
+    }
+
+    $by_code = array();
+
+    foreach ( $people as $person ) {
+        if ( ! is_array( $person ) || empty( $person['is_psr'] ) ) {
+            continue;
+        }
+
+        $code = isset( $person['department_code'] ) ? trim( (string) $person['department_code'] ) : '';
+        $label = isset( $person['department_name'] ) ? trim( (string) $person['department_name'] ) : '';
+
+        if ( '' === $code || '' === $label ) {
+            continue;
+        }
+
+        if ( ! isset( $by_code[ $code ] ) ) {
+            $by_code[ $code ] = array(
+                'code'  => $code,
+                'label' => $label,
+            );
+        }
+    }
+
+    $departments = array_values( $by_code );
+
+    usort(
+        $departments,
+        static function ( $a, $b ) {
+            return strcasecmp( (string) $a['label'], (string) $b['label'] );
+        }
+    );
+
+    return $departments;
 }
 
 /**
@@ -316,6 +392,7 @@ function cimne_directory_filters_shortcode() {
     }
 
     $role_tree = cimne_directory_get_role_tree();
+    $people = cimne_directory_get_people();
 
     if ( is_wp_error( $role_tree ) ) {
         if ( function_exists( 'cimne_api_log' ) ) {
@@ -328,14 +405,26 @@ function cimne_directory_filters_shortcode() {
         $role_tree = array();
     }
 
+    if ( is_wp_error( $people ) ) {
+        if ( function_exists( 'cimne_api_log' ) ) {
+            cimne_api_log(
+                'Directory filter metadata could not be built from /directorio.',
+                array( 'error_code' => $people->get_error_code() )
+            );
+        }
+
+        $people = array();
+    }
+
     ob_start();
 
     get_template_part(
         'template-parts/directory/filters',
         null,
         array(
-            'role_tree' => $role_tree,
-            'locations' => cimne_directory_get_locations(),
+            'role_tree'       => $role_tree,
+            'locations'       => cimne_directory_get_locations( $people ),
+            'psr_departments' => cimne_directory_get_psr_departments( $people ),
         )
     );
 

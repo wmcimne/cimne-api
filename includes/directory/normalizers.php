@@ -438,6 +438,22 @@ function cimne_normalize_directory_person( array $person ) {
         )
     );
 
+    $department_code = trim(
+        (string) cimne_directory_value(
+            $person,
+            array( 'departamento_cod', 'departamento_codigo', 'department_code' ),
+            ''
+        )
+    );
+
+    $department_name = trim(
+        (string) cimne_directory_value(
+            $person,
+            array( 'departamento_desc', 'departamento_descripcion', 'department_name' ),
+            ''
+        )
+    );
+
     $unit_roles = cimne_directory_normalize_unit_roles( $person );
     $unit_codes = array();
 
@@ -491,9 +507,11 @@ function cimne_normalize_directory_person( array $person ) {
         'phone'        => $phone,
         'category'     => $category,
         'display_roles'=> $display_roles,
-        'centre_code'  => $centre_code,
-        'centre_name'  => $centre_name,
-        'is_psr'       => (bool) cimne_directory_value( $person, array( 'esPSR', 'is_psr' ), false ),
+        'centre_code'    => $centre_code,
+        'centre_name'    => $centre_name,
+        'department_code'=> $department_code,
+        'department_name'=> $department_name,
+        'is_psr'         => (bool) cimne_directory_value( $person, array( 'esPSR', 'is_psr' ), false ),
         'is_pdi'       => (bool) cimne_directory_value( $person, array( 'esPDI', 'is_pdi' ), false ),
         'unit_codes'   => $unit_codes,
         'unit_roles'   => $unit_roles,

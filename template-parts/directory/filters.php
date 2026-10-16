@@ -6,7 +6,8 @@
  *
  * Expected $args:
  * - role_tree: Cluster > Group structure generated from research_units.
- * - locations: hardcoded list of CIMNE office codes and labels.
+ * - locations: unique centro_cod/centro_desc options derived from /directorio.
+ * - psr_departments: unique departamento_cod/departamento_desc options for PSR staff.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -20,13 +21,17 @@ $role_tree = isset( $args['role_tree'] ) && is_array( $args['role_tree'] )
 $locations = isset( $args['locations'] ) && is_array( $args['locations'] )
     ? $args['locations']
     : array();
+
+$psr_departments = isset( $args['psr_departments'] ) && is_array( $args['psr_departments'] )
+    ? $args['psr_departments']
+    : array();
 ?>
 
 <form class="cimne-directory-filters" data-cimne-directory-filters autocomplete="off">
     <div class="form-group cimne-directory-filters__field cimne-directory-filters__field--search">
-        <!--<label class="cimne-directory-filters__search-label" for="cimne-directory-search">
+        <label class="cimne-directory-filters__search-label" for="cimne-directory-search">
             <?php echo esc_html__( 'Search', 'cimne' ); ?>
-        </label>-->
+        </label>
         <input
             id="cimne-directory-search"
             type="search"
@@ -89,6 +94,24 @@ $locations = isset( $args['locations'] ) && is_array( $args['locations'] )
                 data-role-level="psr-pdi"
                 data-filter-type="psr"
             ><?php echo esc_html__( 'PSR', 'cimne' ); ?></option>
+
+            <?php foreach ( $psr_departments as $department ) : ?>
+                <?php
+                $department_code = isset( $department['code'] ) ? trim( (string) $department['code'] ) : '';
+                $department_label = isset( $department['label'] ) ? trim( (string) $department['label'] ) : '';
+
+                if ( '' === $department_code || '' === $department_label ) {
+                    continue;
+                }
+                ?>
+                <option
+                    class="cimne-directory-role-option cimne-directory-role-option--level-department cimne-directory-role-option--psr-department"
+                    value="psr-department:<?php echo esc_attr( $department_code ); ?>"
+                    data-role-level="psr-department"
+                    data-filter-type="psr-department"
+                    data-department-code="<?php echo esc_attr( $department_code ); ?>"
+                ><?php echo esc_html( '— ' . $department_label ); ?></option>
+            <?php endforeach; ?>
 
             <option
                 class="cimne-directory-role-option cimne-directory-role-option--level-primary cimne-directory-role-option--pdi"
