@@ -1,0 +1,92 @@
+/**
+ * CIMNE Directory filters - Step 7B.3.
+ *
+ * Search, Location and Role intentionally mirror the field styling used by the filters
+ * on /research/projects/. This file does NOT redefine .cimne-directory-list,
+ * so the validated Flexbox layout in directory-api.css remains untouched.
+ */
+
+.cimne-directory-filters {
+    display: grid;
+    gap: 18px;
+    width: 100%;
+}
+
+.cimne-directory-filters__field {
+    margin: 0;
+}
+
+.cimne-directory-filters__search-label {
+    display: block;
+    margin: 0 0 10px;
+    color: var(--cimne-research-teal, #00a0a5);
+    font-size: 22px;
+    font-weight: 400;
+    line-height: 1.2;
+}
+
+.cimne-directory-filters__field input,
+.cimne-directory-filters__field select {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 35px;
+    padding: 6px 10px;
+    border: 1px solid #bfc0c2;
+    border-radius: 0;
+    background: #fff;
+    color: var(--cimne-research-text, #333);
+    font: inherit;
+}
+
+.cimne-directory-filters__field input::placeholder {
+    color: #777;
+    opacity: 1;
+}
+
+.cimne-directory-filters__field input:focus,
+.cimne-directory-filters__field select:focus {
+    outline: 2px solid var(--cimne-research-teal, #00a0a5);
+    outline-offset: 2px;
+}
+
+/*
+ * Styling hooks for Role hierarchy.
+ *
+ * Native <option> styling support varies by browser/OS. These classes are
+ * provided so visual tweaks can be applied where supported without changing
+ * markup or JS. data-role-level mirrors the same hierarchy for debugging or a
+ * future custom dropdown.
+ *
+ * Primary level:
+ * .cimne-directory-role-option--level-primary
+ * .cimne-directory-role-option--psr
+ * .cimne-directory-role-option--pdi
+ *
+ * Cluster / Innovation Unit level:
+ * .cimne-directory-role-option--level-unit
+ * .cimne-directory-role-option--cluster-iu
+ * .cimne-directory-role-option--cluster
+ * .cimne-directory-role-option--innovation-unit
+ *
+ * Research Group level:
+ * .cimne-directory-role-option--level-group
+ * .cimne-directory-role-option--group
+ */
+option.cimne-directory-role-option.cimne-directory-role-option--level-primary {
+    background: rgba(2, 160, 165, 0.15) !important;
+    font-weight: 700;
+    color: #004996 !important;
+}
+
+option.cimne-directory-role-option.cimne-directory-role-option--level-unit {
+    font-weight: 700;
+}
+
+.cimne-directory-person.is-directory-filter-hidden,
+.cimne-directory-person[hidden] {
+    display: none !important;
+}
+
+.cimne-directory__empty[hidden] {
+    display: none !important;
+}

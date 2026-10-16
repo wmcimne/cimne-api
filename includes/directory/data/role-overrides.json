@@ -1,0 +1,61 @@
+[
+  {
+    "fnet_id": 1531,
+    "departamento_desc": "Managing Board",
+    "roles_unidades_inv": [
+      {
+        "rol_desc": "[RTD] Associate Research Professor",
+        "rol_pol": "Executive Council"
+      }
+    ]
+  },
+  {
+    "fnet_id": 1560,
+    "departamento_desc": "Managing Board",
+    "roles_unidades_inv": [
+      {
+        "rol_desc": "[RTD] Full Research Professor",
+        "rol_pol": "General Director"
+      }
+    ]
+  },
+  {
+    "fnet_id": 1559,
+    "departamento_desc": "Managing Board",
+    "roles_unidades_inv": [
+      {
+        "rol_desc": "[RTD] Full Research Professor",
+        "rol_pol": "Scientific Director"
+      }
+    ]
+  },
+  {
+    "fnet_id": 1581,
+    "departamento_desc": "Managing Board",
+    "roles_unidades_inv": [
+      {
+        "rol_desc": "[IU] Senior Innovation Leader",
+        "rol_pol": "Project Development Director"
+      }
+    ]
+  },
+  {
+    "fnet_id": 1510,
+    "departamento_desc": "Managing Board",
+    "roles_unidades_inv": [
+      {
+        "rol_desc": "[RTD] Full Research Professor",
+        "rol_pol": "Institutional Relations Director"
+      }
+    ]
+  },
+  {
+    "fnet_id": 1572,
+    "departamento_desc": "Managing Board",
+    "roles_unidades_inv": [
+      {
+        "rol_pol": "Managing Director"
+      }
+    ]
+  }
+]

@@ -1,0 +1,54 @@
+/* ==========================================================
+   CIMNE Workshops
+========================================================== */
+
+#workshop-blog {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 32px;
+}
+
+#workshop-blog.is-loading,
+#workshop-pagination.is-loading {
+    opacity: 0.35;
+    pointer-events: none;
+}
+
+.cimne-workshops-empty {
+    grid-column: 1 / -1;
+}
+
+#workshop-blog .et_pb_post {
+    margin-bottom: 0;
+}
+
+#workshop-blog .entry-featured-image-url img {
+    display: block;
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+}
+
+#workshop-blog .entry-title {
+    margin-bottom: 14px;
+}
+
+#workshop-blog .type-of-event {
+    margin-bottom: 12px;
+}
+
+#workshop-blog .post-content .date {
+    margin-top: 8px;
+}
+
+@media (max-width: 980px) {
+    #workshop-blog {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 767px) {
+    #workshop-blog {
+        grid-template-columns: 1fr;
+    }
+}

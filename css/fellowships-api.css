@@ -1,0 +1,344 @@
+:root {
+    --cimne-fellowships-blue: #004996;
+    --cimne-fellowships-teal: #02a0a5;
+    --cimne-fellowships-teal-soft: #82d5d9;
+    --cimne-fellowships-line: #d9d9d9;
+    --cimne-fellowships-panel: #dff3f4;
+    --cimne-fellowships-text: #202020;
+}
+
+.cimne-fellowships-empty {
+    margin: 0;
+}
+
+.cimne-fellowships__tabs {
+    display: flex;
+    gap: 24px;
+    margin: 0 0 24px;
+    padding: 0 0 12px;
+    border-bottom: 1px solid var(--cimne-fellowships-teal-soft);
+}
+
+.cimne-fellowships__tab {
+    appearance: none;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--cimne-fellowships-teal-soft);
+    font: inherit;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.cimne-fellowships__tab.is-active,
+.cimne-fellowships__tab:hover,
+.cimne-fellowships__tab:focus-visible {
+    color: var(--cimne-fellowships-teal);
+}
+
+.cimne-fellowships__tab:focus-visible,
+.cimne-fellowships-filters [data-fellowship-filters-apply]:focus-visible,
+.cimne-fellowships-filters [data-fellowship-filters-refresh]:focus-visible {
+    outline: 2px solid var(--cimne-fellowships-teal);
+    outline-offset: 3px;
+}
+
+.cimne-fellowships__notice {
+    min-height: 0;
+    margin-bottom: 8px;
+    color: var(--cimne-fellowships-text);
+}
+
+.cimne-fellowships__notice:empty {
+    display: none;
+}
+
+.cimne-fellowships__notice.is-error {
+    color: #a40000;
+}
+
+.cimne-fellowships.is-loading .cimne-fellowships__content {
+    opacity: .55;
+    pointer-events: none;
+}
+
+.cimne-fellowship-list__group + .cimne-fellowship-list__group {
+    margin-top: 22px;
+}
+
+.cimne-fellowship-list__category {
+    margin: 0 0 15px;
+    color: var(--cimne-fellowships-blue);
+    font-size: 18px;
+    line-height: 1.2;
+}
+
+.cimne-fellowship-list__item {
+    padding: 14px 0 17px;
+    border-bottom: 1px solid var(--cimne-fellowships-line);
+}
+
+.cimne-fellowship-list__item[hidden],
+.cimne-fellowship-list__group[hidden] {
+    display: none !important;
+}
+
+.cimne-fellowship-list__open {
+    appearance: none;
+    display: block;
+    width: 100%;
+    margin: 0 0 8px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.cimne-fellowship-list__acronym,
+.cimne-fellowship-list__title {
+    display: block;
+    color: var(--cimne-fellowships-teal);
+    font-weight: 700;
+}
+
+.cimne-fellowship-list__acronym {
+    margin-bottom: 3px;
+    font-size: 18px;
+}
+
+.cimne-fellowship-list__title {
+    max-width: 900px;
+    font-size: 17px;
+    line-height: 1.45;
+}
+
+.cimne-fellowship-list__open:hover .cimne-fellowship-list__title,
+.cimne-fellowship-list__open:hover .cimne-fellowship-list__acronym,
+.cimne-fellowship-list__open:focus-visible .cimne-fellowship-list__title,
+.cimne-fellowship-list__open:focus-visible .cimne-fellowship-list__acronym {
+    text-decoration: underline;
+}
+
+.cimne-fellowship-list__meta {
+    margin: 0;
+    font-size: 14px;
+}
+
+.cimne-fellowship-list__meta > div {
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr);
+    gap: 8px 16px;
+    margin-top: 3px;
+}
+
+.cimne-fellowship-list__meta dt {
+    font-weight: 700;
+}
+
+.cimne-fellowship-list__meta dd {
+    margin: 0;
+}
+
+/* Detail: mirrors the approved Projects visual structure. */
+.cimne-fellowship-detail {
+    color: var(--cimne-fellowships-text);
+}
+
+.cimne-fellowship-detail__toolbar,
+.cimne-fellowship-detail__header,
+.cimne-fellowship-detail__funding,
+.cimne-fellowship-detail__main {
+    background: var(--cimne-fellowships-panel);
+}
+
+.cimne-fellowship-detail__toolbar {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 5px;
+    padding: 8px 18px;
+    font-size: 13px;
+}
+
+.cimne-fellowship-detail__toolbar button {
+    appearance: none;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+}
+
+.cimne-fellowship-detail__toolbar button:hover,
+.cimne-fellowship-detail__toolbar button:focus-visible {
+    color: var(--cimne-fellowships-teal);
+}
+
+.cimne-fellowship-detail__header,
+.cimne-fellowship-detail__funding,
+.cimne-fellowship-detail__main {
+    margin-bottom: 5px;
+    padding: 18px;
+}
+
+.cimne-fellowship-detail__acronym {
+    margin: 0 0 6px;
+    color: var(--cimne-fellowships-teal);
+    font-size: 23px;
+}
+
+.cimne-fellowship-detail__title {
+    margin: 0;
+    color: var(--cimne-fellowships-teal);
+    font-size: 16px;
+    line-height: 1.45;
+}
+
+.cimne-fellowship-detail__funding-name {
+    margin: 0;
+    font-weight: 700;
+}
+
+.cimne-fellowship-detail__main {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(260px, .8fr);
+    gap: 42px;
+}
+
+.cimne-fellowship-detail__beneficiaries {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 16px;
+}
+
+.cimne-fellowship-detail__beneficiary-label {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 16px;
+    font-style: italic;
+}
+
+.cimne-fellowship-detail__beneficiary-name {
+    font-size: 16px;
+}
+
+.cimne-fellowship-detail__abstract {
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.cimne-fellowship-detail__abstract p:last-child {
+    margin-bottom: 0;
+}
+
+.cimne-fellowship-detail__more summary {
+    position: relative;
+    padding: 10px 0 12px;
+    border-bottom: 1px solid #666;
+    cursor: pointer;
+    list-style: none;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-style: italic;
+}
+
+.cimne-fellowship-detail__more summary::-webkit-details-marker {
+    display: none;
+}
+
+.cimne-fellowship-detail__more summary::after {
+    content: '⌄';
+    position: absolute;
+    right: 8px;
+    font-family: sans-serif;
+    font-style: normal;
+}
+
+.cimne-fellowship-detail__more[open] summary::after {
+    transform: rotate(180deg);
+}
+
+.cimne-fellowship-detail__more-list {
+    margin: 14px 0 0;
+    font-size: 13px;
+}
+
+.cimne-fellowship-detail__more-list > div {
+    display: grid;
+    grid-template-columns: minmax(100px, .45fr) minmax(0, 1fr);
+    gap: 10px;
+    padding: 5px 0;
+}
+
+.cimne-fellowship-detail__more-list dt {
+    font-weight: 700;
+}
+
+.cimne-fellowship-detail__more-list dd {
+    margin: 0;
+}
+
+/* Filters: same field system as /research/projects/. */
+.cimne-fellowships-filters {
+    display: grid;
+    gap: 18px;
+    width: 100%;
+}
+
+.cimne-fellowships-filters__field {
+    margin: 0;
+}
+
+.cimne-fellowships-filters__search-label {
+    display: block;
+    margin: 0 0 10px;
+    color: var(--cimne-fellowships-teal);
+    font-size: 22px;
+    font-weight: 400;
+    line-height: 1.2;
+}
+
+.cimne-fellowships-filters__field input,
+.cimne-fellowships-filters__field select {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 35px;
+    padding: 6px 10px;
+    border: 1px solid #bfc0c2;
+    border-radius: 0;
+    background: #fff;
+    color: var(--cimne-fellowships-text);
+    font: inherit;
+}
+
+.cimne-fellowships-filters__field input::placeholder {
+    color: #777;
+    opacity: 1;
+}
+
+.cimne-fellowships-filters__field input:focus,
+.cimne-fellowships-filters__field select:focus {
+    outline: 2px solid var(--cimne-fellowships-teal);
+    outline-offset: 2px;
+}
+
+.cimne-fellowships-filters__actions {
+    margin: 0;
+    padding-top: 2px;
+}
+
+@media (max-width: 767px) {
+    .cimne-fellowships__tabs {
+        flex-wrap: wrap;
+    }
+
+    .cimne-fellowship-detail__main {
+        grid-template-columns: 1fr;
+    }
+
+    .cimne-fellowship-list__meta > div,
+    .cimne-fellowship-detail__more-list > div {
+        grid-template-columns: 1fr;
+        gap: 2px;
+    }
+}

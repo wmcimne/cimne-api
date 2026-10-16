@@ -1,0 +1,79 @@
+/*
+/****************************/
+/*   LOGIN PAGE TEMPLATE   */
+/****************************/
+
+.login h1 a {
+	background-image: url('/wp-content/uploads/2026/05/logo-color-cimne-slogan.png');
+	background-size: 100%;
+	width: 220px;
+	height: 100px;
+}
+
+/* TargetIMC Cambiar el fondo */
+
+body.login {
+    background-color: #fff;
+    /* background-image: url('https://aulas.cimne.com/wp-content/uploads/2024/05/66120149_m_normal_none-scaled.jpg');
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: right; 
+     */
+}
+
+/* TargetIMC Reemplazar Logo */
+
+.login h1 {
+    text-align: center;
+    border: 2px solid #004996;
+    background: #00499633;
+    border-radius: 10px;
+    /*-webkit-box-shadow: 10px 10px 10px 0px #636262;
+    -moz-box-shadow: 10px 10px 10px 0px #636262;
+    box-shadow: 10px 10px 10px 0px #636262;*/
+
+}
+
+.login h1 a {
+  margin-top: 10px;
+  /* background-image: url('https://aulas.cimne.com/wp-content/uploads/2024/05/cropped-logo-red-aulas-blanco.png'); */
+  /*background-size: 250px 76px; /*Modificar aquí para que coincida con el tamaño del logo */
+  /*height: 76px; /*Modificar aquí para que coincida con el tamaño del logo */
+  /*width: 76px; /*Modificar aquí para que coincida con el tamaño del logo */
+}
+
+/* Eliminar el enlace de password olvidado, Eliminar el enlace de volver a la Home, Elimina mensaje de logeado/no logetado */
+/* p#nav, p#backtoblog, #login-message {
+    display: none;
+} */
+p#nav,
+p#backtoblog{
+    padding: 15px 24px 15px 24px !important;
+}
+
+
+p#nav,
+p#backtoblog,
+.login form {
+    
+    background: #00499633;
+    border: 2px solid #004996;
+    -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, .04);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, .04);
+    border-radius: 10px;
+    color: #004996;
+}
+
+.wp-core-ui .button-primary {
+    background: #5fa894;
+    border-color: #5fa894;
+    color: #fff;
+}
+.wp-core-ui .button-primary:hover {
+    background: #27233D;
+    border-color: #27233D;
+}
+#language-switcher > input.button {
+    color: #004996;
+    border-color: #004996;
+}

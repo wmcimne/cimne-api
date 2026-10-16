@@ -1,0 +1,64 @@
+/* ==========================================================
+   CIMNE News
+========================================================== */
+
+#news-results.cimne-news-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 42px 32px;
+}
+
+#news-results .et_pb_post {
+    margin-bottom: 0;
+}
+
+#news-results .entry-featured-image-url {
+    position: relative;
+    display: block;
+    margin-bottom: 22px;
+}
+
+#news-results .entry-featured-image-url img:not(.square-form-img) {
+    display: block;
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+}
+
+#news-results .entry-title {
+    margin-bottom: 12px;
+}
+
+#news-results .entry-title a {
+    text-decoration: none;
+}
+
+#news-results .post-meta {
+    margin-bottom: 14px;
+}
+
+#news-results .post-content-inner p {
+    margin-bottom: 0;
+}
+
+#news-results.is-loading,
+#news-pagination.is-loading {
+    opacity: 0.35;
+    pointer-events: none;
+}
+
+.cimne-news-empty {
+    grid-column: 1 / -1;
+}
+
+@media (max-width: 980px) {
+    #news-results.cimne-news-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 767px) {
+    #news-results.cimne-news-grid {
+        grid-template-columns: 1fr;
+    }
+}

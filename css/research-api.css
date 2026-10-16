@@ -1,0 +1,441 @@
+:root {
+    --cimne-research-blue: #004996;
+    --cimne-research-teal: #02a0a5;
+    --cimne-research-teal-soft: #82d5d9;
+    --cimne-research-line: #d9d9d9;
+    --cimne-research-panel: #dff3f4;
+    --cimne-research-panel-strong: #d5eff0;
+    --cimne-research-text: #202020;
+}
+
+.cimne-research-empty {
+    margin: 0;
+}
+
+/* Staff */
+.cimne-research-staff__role + .cimne-research-staff__role {
+    margin-top: 24px;
+}
+
+.cimne-research-staff__role-title {
+    margin: 0 0 24px;
+    color: var(--cimne-research-blue);
+    font-size: clamp(22px, 2vw, 28px);
+    line-height: 1.15;
+}
+
+.cimne-research-staff__grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(220px, 280px));
+    gap: 24px 40px;
+    align-items: stretch;
+}
+
+.cimne-research-staff__card {
+    border: 1px solid var(--cimne-research-teal);
+    padding: 10px 10px 12px;
+    min-height: 102px;
+}
+
+.cimne-research-staff__name {
+    margin: 0 0 7px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid var(--cimne-research-line);
+    color: var(--cimne-research-teal);
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.25;
+}
+
+.cimne-research-staff__contact,
+.cimne-research-staff__copy-email {
+    display: flex;
+    gap: 9px;
+    align-items: center;
+    min-height: 23px;
+    font: inherit;
+    font-size: 14px;
+    color: var(--cimne-research-text);
+}
+
+.cimne-research-staff__copy-email {
+    appearance: none;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    text-align: left;
+    cursor: pointer;
+}
+
+.cimne-research-staff__copy-email:hover,
+.cimne-research-staff__copy-email:focus-visible {
+    color: var(--cimne-research-teal);
+}
+
+.cimne-research-staff__icon {
+    display: inline-flex;
+    width: 15px;
+    height: 15px;
+    flex: 0 0 15px;
+}
+
+.cimne-research-staff__icon svg {
+    width: 100%;
+    height: 100%;
+    fill: currentColor;
+}
+
+/* Projects shell
+ *
+ * Ongoing / Finished navigation is rendered and styled by Divi.
+ * The API component only owns the dynamic results/detail area.
+ */
+.cimne-research-projects {
+    width: 100%;
+}
+
+.cimne-research-projects__main {
+    width: 100%;
+    min-width: 0;
+}
+
+.cimne-research-projects__notice {
+    min-height: 0;
+    margin-bottom: 8px;
+    color: var(--cimne-research-text);
+}
+
+.cimne-research-projects__notice:empty {
+    display: none;
+}
+
+.cimne-research-projects__notice.is-error {
+    color: #a40000;
+}
+
+.cimne-research-projects.is-loading .cimne-research-projects__content {
+    opacity: .55;
+    pointer-events: none;
+}
+
+/* Project list */
+/*
+ * Functional state used by Search and Principal Investigator filters.
+ * Keep this rule independent from the visual card layout: project cards use
+ * display:grid, so relying only on the HTML hidden attribute is not robust.
+ */
+.cimne-project-list__item.is-client-filter-hidden,
+.cimne-project-list__group.is-client-filter-hidden {
+    display: none !important;
+}
+
+.cimne-project-list__group + .cimne-project-list__group {
+    margin-top: 22px;
+}
+
+.cimne-project-list__category {
+    margin: 0 0 15px;
+    color: var(--cimne-research-blue);
+    font-size: 18px;
+    line-height: 1.2;
+    font-weight: 700;
+    text-transform: capitalize;
+}
+
+.cimne-project-list__item {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 24px;
+    padding: 14px 0 17px;
+    border-bottom: 1px solid var(--cimne-research-line);
+}
+
+.cimne-project-list__open {
+    appearance: none;
+    display: block;
+    width: 100%;
+    margin: 0 0 8px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.cimne-project-list__acronym,
+.cimne-project-list__title {
+    display: block;
+    color: var(--cimne-research-teal);
+    font-weight: 700;
+}
+
+.cimne-project-list__acronym {
+    margin-bottom: 3px;
+    font-size: 18px;
+}
+
+.cimne-project-list__title {
+    max-width: 900px;
+    font-size: 17px;
+    line-height: 1.45;
+}
+
+.cimne-project-list__open:hover .cimne-project-list__title,
+.cimne-project-list__open:hover .cimne-project-list__acronym,
+.cimne-project-list__open:focus-visible .cimne-project-list__title,
+.cimne-project-list__open:focus-visible .cimne-project-list__acronym {
+    text-decoration: underline;
+}
+
+.cimne-project-list__meta {
+    margin: 0;
+    font-size: 14px;
+}
+
+.cimne-project-list__meta > div {
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr);
+    gap: 8px 16px;
+    margin-top: 3px;
+}
+
+.cimne-project-list__meta dt {
+    font-weight: 700;
+}
+
+.cimne-project-list__meta dd {
+    margin: 0;
+}
+
+.cimne-project-list__website {
+    align-self: start;
+    margin-top: 40px;
+    white-space: nowrap;
+    color: var(--cimne-research-text);
+    font-weight: 700;
+    text-decoration: none;
+}
+
+/* Project detail */
+.cimne-project-detail {
+    color: var(--cimne-research-text);
+}
+
+.cimne-project-detail__toolbar,
+.cimne-project-detail__header,
+.cimne-project-detail__funding,
+.cimne-project-detail__main,
+.cimne-project-detail__footer {
+    background: var(--cimne-research-panel);
+}
+
+.cimne-project-detail__toolbar {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 5px;
+    padding: 8px 18px;
+    font-size: 13px;
+}
+
+.cimne-project-detail__toolbar button {
+    appearance: none;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+}
+
+.cimne-project-detail__toolbar button:hover,
+.cimne-project-detail__toolbar button:focus-visible {
+    color: var(--cimne-research-teal);
+}
+
+.cimne-project-detail__header {
+    margin-bottom: 5px;
+    padding: 18px;
+}
+
+.cimne-project-detail__acronym {
+    margin: 0 0 6px;
+    color: var(--cimne-research-teal);
+    font-size: 23px;
+}
+
+.cimne-project-detail__title {
+    margin: 0;
+    color: var(--cimne-research-teal);
+    font-size: 16px;
+    line-height: 1.45;
+}
+
+.cimne-project-detail__funding {
+    margin-bottom: 5px;
+    padding: 18px;
+}
+
+.cimne-project-detail__funding-logo {
+    display: block;
+    max-width: min(360px, 100%);
+    height: auto;
+    margin-bottom: 10px;
+}
+
+.cimne-project-detail__funding-name {
+    margin: 0 0 8px;
+    font-weight: 700;
+}
+
+.cimne-project-detail__funding-notice p:last-child {
+    margin-bottom: 0;
+}
+
+.cimne-project-detail__main {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(260px, .8fr);
+    gap: 42px;
+    margin-bottom: 5px;
+    padding: 18px;
+}
+
+.cimne-project-detail__pi {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 12px;
+}
+
+.cimne-project-detail__pi-photo-wrap {
+    width: 90px;
+    height: 90px;
+    flex: 0 0 90px;
+    overflow: hidden;
+    border: 1px solid var(--cimne-research-teal);
+    border-radius: 50%;
+}
+
+.cimne-project-detail__pi-photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.cimne-project-detail__pi-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.cimne-project-detail__pi-label {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 16px;
+    font-style: italic;
+}
+
+.cimne-project-detail__pi-name {
+    font-size: 16px;
+}
+
+.cimne-project-detail__pi-email {
+    color: var(--cimne-research-teal);
+    text-decoration: none;
+}
+
+.cimne-project-detail__abstract {
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.cimne-project-detail__abstract p:last-child {
+    margin-bottom: 0;
+}
+
+.cimne-project-detail__more summary {
+    position: relative;
+    padding: 10px 0 12px;
+    border-bottom: 1px solid #666;
+    cursor: pointer;
+    list-style: none;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-style: italic;
+}
+
+.cimne-project-detail__more summary::-webkit-details-marker {
+    display: none;
+}
+
+.cimne-project-detail__more summary::after {
+    content: '⌄';
+    position: absolute;
+    right: 8px;
+    font-family: sans-serif;
+    font-style: normal;
+}
+
+.cimne-project-detail__more[open] summary::after {
+    transform: rotate(180deg);
+}
+
+.cimne-project-detail__more-list {
+    margin: 14px 0 0;
+    font-size: 13px;
+}
+
+.cimne-project-detail__more-list > div {
+    display: grid;
+    grid-template-columns: minmax(100px, .45fr) minmax(0, 1fr);
+    gap: 10px;
+    padding: 5px 0;
+}
+
+.cimne-project-detail__more-list dt {
+    font-weight: 700;
+}
+
+.cimne-project-detail__more-list dd {
+    margin: 0;
+}
+
+.cimne-project-detail__footer {
+    padding: 18px;
+}
+
+.cimne-project-detail__footer a {
+    color: var(--cimne-research-text);
+    font-weight: 700;
+    text-decoration: none;
+}
+
+@media (max-width: 1100px) {
+    .cimne-research-staff__grid {
+        grid-template-columns: repeat(2, minmax(220px, 1fr));
+    }
+
+}
+
+@media (max-width: 767px) {
+    .cimne-research-staff__grid {
+        grid-template-columns: 1fr;
+    }
+
+
+    .cimne-project-list__item {
+        grid-template-columns: 1fr;
+    }
+
+    .cimne-project-list__website {
+        margin-top: 0;
+    }
+
+    .cimne-project-detail__main {
+        grid-template-columns: 1fr;
+    }
+
+    .cimne-project-detail__toolbar {
+        flex-wrap: wrap;
+    }
+}
+
