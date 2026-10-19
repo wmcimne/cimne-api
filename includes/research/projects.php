@@ -101,6 +101,70 @@ function cimne_projects_get_public_page_url( $context = 'research' ) {
 }
 
 /**
+ * Returns the standalone Project Card page URL in the current language.
+ *
+ * @return string
+ */
+function cimne_projects_get_project_card_page_url() {
+    $url          = '';
+    $project_card = get_page_by_path( 'research/projects/project-card', OBJECT, 'page' );
+
+    if ( $project_card instanceof WP_Post ) {
+        $page_id          = (int) $project_card->ID;
+        $current_language = apply_filters( 'wpml_current_language', null );
+
+        if ( is_string( $current_language ) && '' !== $current_language ) {
+            $translated_id = apply_filters( 'wpml_object_id', $page_id, 'page', true, $current_language );
+
+            if ( is_numeric( $translated_id ) && (int) $translated_id > 0 ) {
+                $page_id = (int) $translated_id;
+            }
+        }
+
+        $resolved_permalink = get_permalink( $page_id );
+
+        if ( is_string( $resolved_permalink ) && '' !== $resolved_permalink ) {
+            $url = $resolved_permalink;
+        }
+    }
+
+    if ( '' === $url ) {
+        $url              = home_url( '/research/projects/project-card/' );
+        $current_language = apply_filters( 'wpml_current_language', null );
+
+        if ( is_string( $current_language ) && '' !== $current_language ) {
+            $translated_url = apply_filters( 'wpml_permalink', $url, $current_language, true );
+
+            if ( is_string( $translated_url ) && '' !== $translated_url ) {
+                $url = $translated_url;
+            }
+        }
+    }
+
+    return (string) apply_filters( 'cimne_projects_project_card_page_url', $url );
+}
+
+/**
+ * Builds one public standalone Project Card URL.
+ *
+ * @param string $project_code Project code.
+ * @return string
+ */
+function cimne_projects_build_project_card_url( $project_code ) {
+    $project_code = trim( sanitize_text_field( (string) $project_code ) );
+
+    if ( '' === $project_code ) {
+        return '';
+    }
+
+    return add_query_arg(
+        'project',
+        $project_code,
+        cimne_projects_get_project_card_page_url()
+    );
+}
+
+/**
  * Returns the API scope for a normalized research unit.
  *
  * @param string $code Research-unit code.
@@ -408,13 +472,13 @@ function cimne_research_render_project_list( array $projects, $status ) {
  * @param array $project Reduced project detail.
  * @return string
  */
-function cimne_research_render_project_detail( array $project ) {
+function cimne_research_render_project_detail( array $project, array $display_args = array() ) {
     ob_start();
 
     get_template_part(
         'template-parts/research/project-detail',
         null,
-        array( 'project' => $project )
+        array_merge( array( 'project' => $project ), $display_args )
     );
 
     return (string) ob_get_clean();
@@ -444,6 +508,7 @@ function cimne_research_get_projects_context( $code ) {
         'research_unit_code' => $code,
         'is_cluster'         => cimne_research_unit_is_cluster( $unit ),
         'projects_page_url'  => cimne_projects_get_public_page_url( 'research' ),
+        'project_card_url'   => '',
         'ongoing_html'       => cimne_research_render_project_list( $projects, 'ongoing' ),
     );
 }
@@ -465,6 +530,7 @@ function cimne_global_get_projects_context() {
         'research_unit_code' => '',
         'is_cluster'         => false,
         'projects_page_url'  => cimne_projects_get_public_page_url( 'global' ),
+        'project_card_url'   => cimne_projects_get_project_card_page_url(),
         'ongoing_html'       => cimne_research_render_project_list( $projects, 'ongoing' ),
     );
 }
@@ -558,3 +624,52 @@ function cimne_projects_shortcode() {
     return cimne_research_render_projects( $context );
 }
 add_shortcode( 'cimne_projects', 'cimne_projects_shortcode' );
+
+/**
+ * Standalone Project Card shortcode.
+ *
+ * Usage on /research/projects/project-card/:
+ * [cimne_project_card]
+ *
+ * The project is selected from ?project=P00001.
+ *
+ * @return string
+ */
+function cimne_project_card_shortcode() {
+    if ( is_admin() && ! wp_doing_ajax() ) {
+        return '';
+    }
+
+    $project_code = isset( $_GET['project_code'] )
+        ? trim( sanitize_text_field( wp_unslash( $_GET['project_code'] ) ) )
+        : '';
+
+    if ( '' === $project_code || ! preg_match( '/^[A-Za-z0-9._-]+$/', $project_code ) ) {
+        return '<p class="cimne-research-empty">' . esc_html__( 'Project not found.', 'cimne' ) . '</p>';
+    }
+
+    $project = cimne_global_get_project_detail( $project_code );
+
+    if ( is_wp_error( $project ) ) {
+        cimne_api_log(
+            'Standalone Project Card could not be rendered.',
+            array(
+                'project'    => $project_code,
+                'error_code' => $project->get_error_code(),
+            )
+        );
+
+        return '<p class="cimne-research-empty">' . esc_html__( 'Project not found.', 'cimne' ) . '</p>';
+    }
+
+    return cimne_research_render_project_detail(
+        $project,
+        array(
+            'standalone'       => true,
+            'back_url'         => cimne_projects_get_public_page_url( 'research' ),
+            'project_card_url' => cimne_projects_build_project_card_url( $project_code ),
+        )
+    );
+}
+add_shortcode( 'cimne_project_card', 'cimne_project_card_shortcode' );
+

@@ -7,7 +7,10 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-$project = isset( $args['project'] ) && is_array( $args['project'] ) ? $args['project'] : array();
+$project          = isset( $args['project'] ) && is_array( $args['project'] ) ? $args['project'] : array();
+$standalone       = ! empty( $args['standalone'] );
+$back_url         = isset( $args['back_url'] ) ? trim( (string) $args['back_url'] ) : '';
+$project_card_url = isset( $args['project_card_url'] ) ? trim( (string) $args['project_card_url'] ) : '';
 
 $code        = isset( $project['code'] ) ? trim( (string) $project['code'] ) : '';
 $acronym     = isset( $project['acronym'] ) ? trim( (string) $project['acronym'] ) : '';
@@ -50,13 +53,23 @@ $more_information = array_filter(
 ?>
 <article class="cimne-project-detail" data-project-code="<?php echo esc_attr( $code ); ?>">
     <div class="cimne-project-detail__toolbar">
-        <button type="button" class="cimne-project-detail__copy-url" data-copy-project-url="<?php echo esc_attr( $code ); ?>">
-            <?php echo esc_html__( 'Copy project URL', 'cimne' ); ?> <span aria-hidden="true"></span>
-        </button>
+        <?php if ( $standalone ) : ?>
+            <button type="button" class="cimne-project-detail__copy-url" data-copy-project-card-url="<?php echo esc_url( $project_card_url ); ?>">
+                <?php echo esc_html__( 'Copy project URL', 'cimne' ); ?> <span aria-hidden="true">⌁</span>
+            </button>
 
-        <button type="button" class="cimne-project-detail__back" data-project-back>
-            <?php echo esc_html__( 'Back', 'cimne' ); ?> <span aria-hidden="true">↩</span>
-        </button>
+            <button type="button" class="cimne-project-detail__back" data-project-card-back-url="<?php echo esc_url( $back_url ); ?>">
+                <?php echo esc_html__( 'Back', 'cimne' ); ?> <span aria-hidden="true">↩</span>
+            </button>
+        <?php else : ?>
+            <button type="button" class="cimne-project-detail__copy-url" data-copy-project-url="<?php echo esc_attr( $code ); ?>">
+                <?php echo esc_html__( 'Copy project URL', 'cimne' ); ?> <span aria-hidden="true">⌁</span>
+            </button>
+
+            <button type="button" class="cimne-project-detail__back" data-project-back>
+                <?php echo esc_html__( 'Back', 'cimne' ); ?> <span aria-hidden="true">↩</span>
+            </button>
+        <?php endif; ?>
     </div>
 
     <header class="cimne-project-detail__header">

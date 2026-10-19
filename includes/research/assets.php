@@ -71,7 +71,8 @@ function cimne_research_page_uses_api_components() {
     }
 
     return cimne_research_current_page_has_shortcode( 'cimne_projects' )
-        || cimne_research_current_page_has_shortcode( 'cimne_projects_filters' );
+        || cimne_research_current_page_has_shortcode( 'cimne_projects_filters' )
+        || cimne_research_current_page_has_shortcode( 'cimne_project_card' );
 }
 
 /**

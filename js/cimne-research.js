@@ -54,7 +54,7 @@
         return next.pathname + next.search + next.hash;
     }
 
-    function buildPublicProjectUrl(code, projectsPageUrl) {
+    function buildInlineProjectUrl(code, projectsPageUrl) {
         var base = projectsPageUrl || window.location.href;
         var next = new URL(base, window.location.origin);
 
@@ -62,6 +62,17 @@
         next.hash = '#project=' + encodeURIComponent(code);
 
         return next;
+    }
+
+    function buildPublicProjectUrl(code, context, projectsPageUrl, projectCardUrl) {
+        if (context === 'global' && projectCardUrl) {
+            var card = new URL(projectCardUrl, window.location.origin);
+            card.searchParams.set('project_code', code);
+            card.hash = '';
+            return card;
+        }
+
+        return buildInlineProjectUrl(code, projectsPageUrl);
     }
 
     function projectFromHash() {
@@ -352,6 +363,7 @@
         var listUrl = component.getAttribute('data-list-url') || '';
         var detailUrl = component.getAttribute('data-detail-url') || '';
         var projectsPageUrl = component.getAttribute('data-projects-page-url') || '';
+        var projectCardUrl = component.getAttribute('data-project-card-url') || '';
         var content = component.querySelector('[data-project-content]');
         var notice = component.querySelector('[data-project-notice]');
         var controls = getExternalProjectControls();
@@ -514,7 +526,7 @@
                     var historyUrl;
 
                     if (context === 'global') {
-                        var projectUrl = buildPublicProjectUrl(code, projectsPageUrl);
+                        var projectUrl = buildInlineProjectUrl(code, projectsPageUrl);
                         historyUrl = projectUrl.pathname + projectUrl.search + projectUrl.hash;
                     } else {
                         historyUrl = cleanProjectHash(window.location.href, context);
@@ -616,7 +628,7 @@
                 event.preventDefault();
 
                 var code = copyUrlButton.getAttribute('data-copy-project-url') || '';
-                var shareUrl = buildPublicProjectUrl(code, projectsPageUrl);
+                var shareUrl = buildPublicProjectUrl(code, context, projectsPageUrl, projectCardUrl);
 
                 copyText(shareUrl.toString()).then(function () {
                     var status = component.querySelector('[data-cimne-project-copy-status]');
@@ -697,6 +709,38 @@
     }
 
     document.addEventListener('click', function (event) {
+        var cardCopyButton = event.target.closest('[data-copy-project-card-url]');
+        var cardBackButton = event.target.closest('[data-project-card-back-url]');
+
+        if (cardCopyButton) {
+            event.preventDefault();
+
+            var cardUrl = cardCopyButton.getAttribute('data-copy-project-card-url') || window.location.href;
+
+            copyText(cardUrl).then(function () {
+                var detail = cardCopyButton.closest('.cimne-project-detail');
+                var status = detail ? detail.querySelector('[data-cimne-project-copy-status]') : null;
+
+                if (status) {
+                    status.textContent = translate('projectUrlCopied', 'Project URL copied.');
+                }
+            });
+
+            return;
+        }
+
+        if (cardBackButton) {
+            event.preventDefault();
+
+            var backUrl = cardBackButton.getAttribute('data-project-card-back-url') || '';
+
+            if (backUrl) {
+                window.location.assign(backUrl);
+            }
+
+            return;
+        }
+
         var copyButton = event.target.closest('[data-copy-email]');
 
         if (!copyButton) {

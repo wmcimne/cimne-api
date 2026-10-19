@@ -11,6 +11,7 @@
  * - project_context: research|global
  * - research_unit_code
  * - projects_page_url
+ * - project_card_url
  * - ongoing_html
  */
 
@@ -22,6 +23,7 @@ $project_context = isset( $args['project_context'] ) && 'global' === $args['proj
 $unit_code       = isset( $args['research_unit_code'] ) ? (string) $args['research_unit_code'] : '';
 $ongoing           = isset( $args['ongoing_html'] ) ? (string) $args['ongoing_html'] : '';
 $projects_page_url = isset( $args['projects_page_url'] ) ? (string) $args['projects_page_url'] : '';
+$project_card_url  = isset( $args['project_card_url'] ) ? (string) $args['project_card_url'] : '';
 $list_url          = rest_url( 'cimne/v1/research-projects/list' );
 $detail_url      = rest_url( 'cimne/v1/research-projects/detail' );
 ?>
@@ -32,6 +34,7 @@ $detail_url      = rest_url( 'cimne/v1/research-projects/detail' );
     data-project-context="<?php echo esc_attr( $project_context ); ?>"
     data-unit-code="<?php echo esc_attr( $unit_code ); ?>"
     data-projects-page-url="<?php echo esc_url( $projects_page_url ); ?>"
+    data-project-card-url="<?php echo esc_url( $project_card_url ); ?>"
     data-list-url="<?php echo esc_url( $list_url ); ?>"
     data-detail-url="<?php echo esc_url( $detail_url ); ?>"
 >
