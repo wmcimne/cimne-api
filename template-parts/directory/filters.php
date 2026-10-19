@@ -29,9 +29,9 @@ $psr_departments = isset( $args['psr_departments'] ) && is_array( $args['psr_dep
 
 <form class="cimne-directory-filters" data-cimne-directory-filters autocomplete="off">
     <div class="form-group cimne-directory-filters__field cimne-directory-filters__field--search">
-        <label class="cimne-directory-filters__search-label" for="cimne-directory-search">
+        <!--<label class="cimne-directory-filters__search-label" for="cimne-directory-search">
             <?php echo esc_html__( 'Search', 'cimne' ); ?>
-        </label>
+        </label>-->
         <input
             id="cimne-directory-search"
             type="search"

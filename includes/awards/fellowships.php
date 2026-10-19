@@ -39,7 +39,7 @@ function cimne_fellowships_format_date( $date ) {
 /**
  * Normalizes server-side list filters.
  * Search and Beneficiary are intentionally browser-side, just like Search/PI
- * on the Projects page.
+ * on the Projects page. Category is the only server-side filter.
  *
  * @param array $filters Raw filters.
  * @return array
@@ -47,7 +47,6 @@ function cimne_fellowships_format_date( $date ) {
 function cimne_fellowships_normalize_list_filters( array $filters ) {
     return array(
         'category' => isset( $filters['category'] ) ? trim( sanitize_text_field( (string) $filters['category'] ) ) : '',
-        'unit'     => isset( $filters['unit'] ) ? trim( sanitize_text_field( (string) $filters['unit'] ) ) : '',
     );
 }
 
@@ -66,9 +65,6 @@ function cimne_fellowships_apply_server_filters( array $args, array $filters ) {
         $args['naturaleza_proyecto_descripcion'] = $filters['category'];
     }
 
-    if ( '' !== $filters['unit'] ) {
-        $args['IU'] = $filters['unit'];
-    }
 
     return $args;
 }
@@ -77,7 +73,7 @@ function cimne_fellowships_apply_server_filters( array $args, array $filters ) {
  * Gets one reduced fellowship list.
  *
  * @param string $status  ongoing|finished.
- * @param array  $filters Category/unit filters.
+ * @param array  $filters Category filter.
  * @return array|WP_Error
  */
 function cimne_fellowships_get_list( $status = 'ongoing', array $filters = array() ) {

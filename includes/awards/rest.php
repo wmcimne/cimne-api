@@ -43,11 +43,6 @@ function cimne_fellowships_register_rest_routes() {
                     'default'           => '',
                     'sanitize_callback' => 'cimne_fellowships_rest_identifier',
                 ),
-                'unit' => array(
-                    'required'          => false,
-                    'default'           => '',
-                    'sanitize_callback' => 'cimne_fellowships_rest_identifier',
-                ),
             ),
         )
     );
@@ -79,10 +74,8 @@ add_action( 'rest_api_init', 'cimne_fellowships_register_rest_routes' );
 function cimne_fellowships_rest_list( WP_REST_Request $request ) {
     $status   = sanitize_key( (string) $request->get_param( 'status' ) );
     $category = cimne_fellowships_rest_identifier( $request->get_param( 'category' ) );
-    $unit     = cimne_fellowships_rest_identifier( $request->get_param( 'unit' ) );
     $filters  = array(
         'category' => $category,
-        'unit'     => $unit,
     );
 
     $items = cimne_fellowships_get_list( $status, $filters );

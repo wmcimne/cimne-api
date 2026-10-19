@@ -8,27 +8,35 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Registers the logical Fellowships resource in the shared CIMNE API client.
+ * Registers the Fellowships and Fellowships-options resources in the shared CIMNE API client.
  *
  * @param array $resources Existing logical resource map.
  * @return array
  */
 function cimne_awards_register_api_resources( array $resources ) {
     $resources['fellowships'] = 'becas';
+    $resources['opts_becas']   = 'opts_becas';
     return $resources;
 }
 add_filter( 'cimne_api_resources', 'cimne_awards_register_api_resources' );
 
 /**
- * Fellowships change less often than interactive frontend state, so 30 minutes
- * matches the current Projects cache policy.
+ * Sets cache TTLs for Fellowships data and its filter-options endpoint.
  *
  * @param int    $ttl      Existing TTL.
  * @param string $resource Logical API resource.
  * @return int
  */
 function cimne_awards_fellowships_cache_ttl( $ttl, $resource ) {
-    return 'fellowships' === $resource ? 30 * MINUTE_IN_SECONDS : $ttl;
+    if ( 'fellowships' === $resource ) {
+        return 30 * MINUTE_IN_SECONDS;
+    }
+
+    if ( 'opts_becas' === $resource ) {
+        return HOUR_IN_SECONDS;
+    }
+
+    return $ttl;
 }
 add_filter( 'cimne_api_cache_ttl', 'cimne_awards_fellowships_cache_ttl', 10, 2 );
 

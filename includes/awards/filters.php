@@ -12,49 +12,40 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Gets cached options required by the Awards / Fellowships filter.
  *
- * There is no assumed opts_becas endpoint:
- * - Category + Beneficiary options come from a reduced /becas request.
- * - Cluster / IU options come from /research_units.
+ * Category and Beneficiary options come from /opts_becas.
+ * Search remains a browser-side free-text filter.
  *
  * @return array
  */
 function cimne_fellowships_get_filter_options() {
     $base = array(
         'nature'        => array(),
-        'units'         => array(),
         'beneficiaries' => array(),
     );
 
-    $fellowship_options = cimne_api_get(
-        'fellowships',
+    $options = cimne_api_get(
+        'opts_becas',
         array(),
         array(
-            'cache_variant' => 'fellowship-filter-options-v1',
+            'cache_variant' => 'fellowship-filter-options-v2',
             'transform'     => 'cimne_normalize_fellowship_filter_options_payload',
         )
     );
 
-    if ( ! is_wp_error( $fellowship_options ) ) {
-        $base['nature']        = isset( $fellowship_options['nature'] ) && is_array( $fellowship_options['nature'] ) ? $fellowship_options['nature'] : array();
-        $base['beneficiaries'] = isset( $fellowship_options['beneficiaries'] ) && is_array( $fellowship_options['beneficiaries'] ) ? $fellowship_options['beneficiaries'] : array();
-    } else {
-        cimne_api_log( 'Fellowship Category/Beneficiary options unavailable.', array( 'error_code' => $fellowship_options->get_error_code() ) );
+    if ( is_wp_error( $options ) ) {
+        cimne_api_log(
+            'Fellowship filter options unavailable.',
+            array( 'error_code' => $options->get_error_code() )
+        );
+        return $base;
     }
 
-    $units = cimne_api_get(
-        'research_units',
-        array(),
-        array(
-            'cache_variant' => 'fellowship-unit-options-v1',
-            'transform'     => 'cimne_normalize_fellowship_unit_options_payload',
-        )
-    );
-
-    if ( ! is_wp_error( $units ) ) {
-        $base['units'] = $units;
-    } else {
-        cimne_api_log( 'Fellowship Research Cluster / IU options unavailable.', array( 'error_code' => $units->get_error_code() ) );
-    }
+    $base['nature'] = isset( $options['nature'] ) && is_array( $options['nature'] )
+        ? $options['nature']
+        : array();
+    $base['beneficiaries'] = isset( $options['beneficiaries'] ) && is_array( $options['beneficiaries'] )
+        ? $options['beneficiaries']
+        : array();
 
     return $base;
 }

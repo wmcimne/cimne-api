@@ -9,7 +9,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 $options       = isset( $args['options'] ) && is_array( $args['options'] ) ? $args['options'] : array();
 $nature        = isset( $options['nature'] ) && is_array( $options['nature'] ) ? $options['nature'] : array();
-$units         = isset( $options['units'] ) && is_array( $options['units'] ) ? $options['units'] : array();
 $beneficiaries = isset( $options['beneficiaries'] ) && is_array( $options['beneficiaries'] ) ? $options['beneficiaries'] : array();
 ?>
 <form class="cimne-fellowships-filters" data-cimne-fellowship-filters>
@@ -32,23 +31,6 @@ $beneficiaries = isset( $options['beneficiaries'] ) && is_array( $options['benef
         <select id="cimne-fellowship-filter-category" name="category" aria-label="<?php echo esc_attr__( 'Category', 'cimne' ); ?>" data-fellowship-filter-category>
             <option value=""><?php echo esc_html__( 'Category', 'cimne' ); ?></option>
             <?php foreach ( $nature as $option ) : ?>
-                <?php
-                $value = isset( $option['value'] ) ? (string) $option['value'] : '';
-                $label = isset( $option['label'] ) ? (string) $option['label'] : '';
-                if ( '' === $value || '' === $label ) {
-                    continue;
-                }
-                ?>
-                <option value="<?php echo esc_attr( $value ); ?>"><?php echo esc_html( $label ); ?></option>
-            <?php endforeach; ?>
-        </select>
-    </div>
-
-    <div class="form-group cimne-fellowships-filters__field">
-        <label class="screen-reader-text" for="cimne-fellowship-filter-unit"><?php echo esc_html__( 'Research cluster / Innovation Unit', 'cimne' ); ?></label>
-        <select id="cimne-fellowship-filter-unit" name="unit" aria-label="<?php echo esc_attr__( 'Research cluster / Innovation Unit', 'cimne' ); ?>" data-fellowship-filter-unit>
-            <option value=""><?php echo esc_html__( 'Research cluster / Innovation Unit', 'cimne' ); ?></option>
-            <?php foreach ( $units as $option ) : ?>
                 <?php
                 $value = isset( $option['value'] ) ? (string) $option['value'] : '';
                 $label = isset( $option['label'] ) ? (string) $option['label'] : '';

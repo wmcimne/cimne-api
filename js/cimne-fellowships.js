@@ -37,7 +37,7 @@
     }
 
     function emptyFilters() {
-        return { search: '', category: '', unit: '', beneficiary: '' };
+        return { search: '', category: '', beneficiary: '' };
     }
 
     function cloneFilters(filters) {
@@ -45,7 +45,6 @@
         return {
             search: String(filters.search || ''),
             category: String(filters.category || ''),
-            unit: String(filters.unit || ''),
             beneficiary: String(filters.beneficiary || '')
         };
     }
@@ -56,13 +55,11 @@
         }
         var search = form.querySelector('[data-fellowship-filter-search]');
         var category = form.querySelector('[data-fellowship-filter-category]');
-        var unit = form.querySelector('[data-fellowship-filter-unit]');
         var beneficiary = form.querySelector('[data-fellowship-filter-beneficiary]');
 
         return {
             search: search ? search.value : '',
             category: category ? category.value : '',
-            unit: unit ? unit.value : '',
             beneficiary: beneficiary ? beneficiary.value : ''
         };
     }
@@ -74,17 +71,15 @@
         }
         var search = form.querySelector('[data-fellowship-filter-search]');
         var category = form.querySelector('[data-fellowship-filter-category]');
-        var unit = form.querySelector('[data-fellowship-filter-unit]');
         var beneficiary = form.querySelector('[data-fellowship-filter-beneficiary]');
         if (search) { search.value = filters.search; }
         if (category) { category.value = filters.category; }
-        if (unit) { unit.value = filters.unit; }
         if (beneficiary) { beneficiary.value = filters.beneficiary; }
     }
 
     function serverKey(status, filters) {
         filters = cloneFilters(filters);
-        return [status, filters.category, filters.unit].join('|');
+        return [status, filters.category].join('|');
     }
 
     function setFilterStatus(form, message) {
@@ -189,8 +184,7 @@
 
             return requestJson(listUrl, {
                 status: status,
-                category: filters.category,
-                unit: filters.unit
+                category: filters.category
             }).then(function (data) {
                 listCache[key] = data.html || '';
                 return listCache[key];

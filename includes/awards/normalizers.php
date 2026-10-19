@@ -259,50 +259,63 @@ function cimne_normalize_fellowship_detail_payload( array $payload, $resource = 
 }
 
 /**
- * Builds Category and Beneficiary options directly from /becas.
+ * Reduces /opts_becas to the values required by the Awards / Fellowships filter.
  *
- * This avoids inventing an opts_becas endpoint. Research-unit options are
- * produced separately from /research_units.
+ * The endpoint follows the same envelope as opts_projects and exposes the
+ * relevant data below proyectos.naturaleza and proyectos.beneficiario.
+ * Research-unit and investigator options are intentionally ignored because
+ * the Awards filter does not expose those controls.
  *
- * @param array  $payload  Raw /becas response.
+ * @param array  $payload  Raw /opts_becas response.
  * @param string $resource Resource name.
  * @param array  $params   Query params.
  * @return array
  */
 function cimne_normalize_fellowship_filter_options_payload( array $payload, $resource = '', array $params = array() ) {
+    $projects = cimne_api_value( $payload, array( 'proyectos' ), array() );
+    $projects = is_array( $projects ) ? $projects : array();
+
+    $raw_nature        = cimne_api_value( $projects, array( 'naturaleza' ), array() );
+    $raw_beneficiaries = cimne_api_value( $projects, array( 'beneficiario' ), array() );
+
     $nature        = array();
     $beneficiaries = array();
 
-    foreach ( $payload as $fellowship ) {
-        if ( ! is_array( $fellowship ) || ! cimne_fellowship_is_public( $fellowship ) ) {
+    foreach ( is_array( $raw_nature ) ? $raw_nature : array() as $item ) {
+        if ( ! is_array( $item ) ) {
             continue;
         }
 
-        $category = trim( (string) cimne_api_value( $fellowship, array( 'naturaleza_proyecto_descripcion' ), '' ) );
+        $description = trim( (string) cimne_api_value( $item, array( 'descripcion' ), '' ) );
 
-        if ( '' !== $category ) {
-            $nature[ strtolower( remove_accents( $category ) ) ] = array(
-                'value' => $category,
-                'label' => $category,
-            );
+        if ( '' === $description ) {
+            continue;
         }
 
-        $people = cimne_api_value( $fellowship, array( 'personal' ), array() );
-        $people = is_array( $people ) ? $people : array();
+        $nature[ strtolower( remove_accents( $description ) ) ] = array(
+            'value' => $description,
+            'label' => $description,
+        );
+    }
 
-        foreach ( cimne_fellowship_extract_beneficiaries( $people ) as $beneficiary ) {
-            $id   = isset( $beneficiary['id'] ) ? $beneficiary['id'] : null;
-            $name = isset( $beneficiary['name'] ) ? trim( (string) $beneficiary['name'] ) : '';
-
-            if ( null === $id || '' === trim( (string) $id ) || '' === $name ) {
-                continue;
-            }
-
-            $beneficiaries[ (string) $id ] = array(
-                'value' => (string) $id,
-                'label' => $name,
-            );
+    foreach ( is_array( $raw_beneficiaries ) ? $raw_beneficiaries : array() as $item ) {
+        if ( ! is_array( $item ) ) {
+            continue;
         }
+
+        $identifier = cimne_api_value( $item, array( 'identificador' ) );
+        $first_name = trim( (string) cimne_api_value( $item, array( 'nombre' ), '' ) );
+        $last_name  = trim( (string) cimne_api_value( $item, array( 'apellidos' ), '' ) );
+        $name       = trim( $first_name . ' ' . $last_name );
+
+        if ( null === $identifier || '' === trim( (string) $identifier ) || '' === $name ) {
+            continue;
+        }
+
+        $beneficiaries[ (string) $identifier ] = array(
+            'value' => (string) $identifier,
+            'label' => $name,
+        );
     }
 
     $nature        = array_values( $nature );
@@ -325,49 +338,4 @@ function cimne_normalize_fellowship_filter_options_payload( array $payload, $res
         'nature'        => $nature,
         'beneficiaries' => $beneficiaries,
     );
-}
-
-/**
- * Builds root Research Cluster / Innovation Unit filter options.
- *
- * @param array  $payload  Raw /research_units response.
- * @param string $resource Resource name.
- * @param array  $params   Query params.
- * @return array
- */
-function cimne_normalize_fellowship_unit_options_payload( array $payload, $resource = '', array $params = array() ) {
-    $units = array();
-
-    foreach ( $payload as $unit ) {
-        if ( ! is_array( $unit ) ) {
-            continue;
-        }
-
-        $code = trim( (string) cimne_api_value( $unit, array( 'codigo' ), '' ) );
-        $name = trim( (string) cimne_api_value( $unit, array( 'nombre' ), '' ) );
-        $type = strtoupper( trim( (string) cimne_api_value( $unit, array( 'tipo_unidad_cod' ), '' ) ) );
-
-        $is_root_unit = in_array( $type, array( 'RC', 'IU' ), true )
-            || 1 === preg_match( '/^(RC|IU)\d+$/i', $code );
-
-        if ( ! $is_root_unit || '' === $code || '' === $name ) {
-            continue;
-        }
-
-        $units[ strtoupper( $code ) ] = array(
-            'value' => $code,
-            'label' => $name,
-        );
-    }
-
-    $units = array_values( $units );
-
-    usort(
-        $units,
-        static function ( $a, $b ) {
-            return strcasecmp( (string) $a['label'], (string) $b['label'] );
-        }
-    );
-
-    return $units;
 }
