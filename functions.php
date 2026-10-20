@@ -332,10 +332,11 @@ require_once get_stylesheet_directory() . '/includes/api/client.php';
 require_once get_stylesheet_directory() . '/includes/api/normalizers.php';
 
 /*================================================
-# Research pages - Dynamic API components
+# Research, publications and awards pages - Dynamic API components
 ================================================*/
 
 require_once get_stylesheet_directory() . '/includes/research/bootstrap.php';
+require_once get_stylesheet_directory() . '/includes/publications/bootstrap.php';
 require_once get_stylesheet_directory() . '/includes/awards/bootstrap.php';
 
 /*================================================

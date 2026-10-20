@@ -1,0 +1,19 @@
+/*
+ * Publications API: only functional states.
+ * Existing CIMNE form/list styles are reused intentionally so the new SSR/REST
+ * component keeps the current Publications design.
+ */
+.cimne-publications.is-loading #publications-container {
+    opacity: .55;
+    pointer-events: none;
+}
+
+.cimne-publications [data-publications-pagination].is-loading {
+    opacity: .35;
+    pointer-events: none;
+}
+
+.cimne-publications-filters input[type="search"],
+.cimne-publications-filters select {
+    width: 100%;
+}
