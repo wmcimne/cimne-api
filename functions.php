@@ -331,6 +331,7 @@ require_once get_stylesheet_directory() . '/includes/api/cache.php';
 require_once get_stylesheet_directory() . '/includes/api/client.php';
 require_once get_stylesheet_directory() . '/includes/api/normalizers.php';
 
+
 /*================================================
 # Research, publications and awards pages - Dynamic API components
 ================================================*/
@@ -339,11 +340,18 @@ require_once get_stylesheet_directory() . '/includes/research/bootstrap.php';
 require_once get_stylesheet_directory() . '/includes/publications/bootstrap.php';
 require_once get_stylesheet_directory() . '/includes/awards/bootstrap.php';
 
+
 /*================================================
 # Directory pages - Dynamic API components
 ================================================*/
 
 require_once get_stylesheet_directory() . '/includes/directory/bootstrap.php';
+
+/*================================================
+# Sheets pages - Dynamic API components
+================================================*/
+
+require_once get_stylesheet_directory() . '/includes/sheets/bootstrap.php';
 
 /*================================================
 # Includes del tema

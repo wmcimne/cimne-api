@@ -1,0 +1,20 @@
+/*
+ * PhD Theses: functional additions only.
+ * The visual design intentionally reuses the existing CIMNE filter classes:
+ * .form-group, .form-control, .form-flex-fields, .flecha-container, .refresh.
+ */
+.cimne-phd-theses-filters input[type="search"] {
+    width: 100%;
+}
+
+.cimne-phd-theses-filters .form-flex-fields input {
+    width: 100%;
+}
+
+#theses-container .is-phd-theses-filter-hidden {
+    display: none !important;
+}
+
+#theses-container [data-phd-theses-filter-empty][hidden] {
+    display: none !important;
+}
