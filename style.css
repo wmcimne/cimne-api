@@ -1313,16 +1313,7 @@ p.staff-name {
   color: #02A0A5;
   font-weight: 700;
 }
-.description-list.cenit-projects .list-title span {
-  color: #F3921A;
-}
-.iu-projects .description-list .list-title span {
-  color: #004996;
-}
-.description-list .list-title span:first-child {
-  -webkit-text-decoration: capitalize;
-          text-decoration: capitalize;
-}
+
 
 .description-list .list-item {
   display: -webkit-box;
@@ -1739,6 +1730,88 @@ details[open] summary::after {
   }
 }  */
 
+
+/* Research projects IU*/
+/* details */
+details {
+  padding: 10px;
+  border-bottom: 1px solid #444444;
+}
+details[open] {
+  background-color: #fff;
+}
+
+details.iu-details  {
+  
+  border-bottom: 1px solid #D9D9D9;
+
+}
+details.iu-details:first-of-type  {
+  
+  border-top: 1px solid #D9D9D9;
+}
+
+details summary::marker,
+details[open] summary::marker {
+  content: "";
+
+}
+
+details .list-item {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: start;
+      -ms-flex-align: start;
+          align-items: flex-start;
+  padding-bottom: 0.4rem;
+}
+
+details summary::after {
+  font-style: normal;
+  float: right;
+  padding-left: 10px;
+  /* content: "\002335"; */
+  content: "\001A06";
+} 
+
+details[open] summary::after {
+  font-style: normal;
+  content: "\001A08";
+}
+
+/* iu-details */
+.iu-details .abstract-item {
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+}
+
+.iu-details .summary-title {
+  color: #004996;
+  font-size: 1.5rem;
+  text-transform: uppercase;
+}
+.iu-details .summary-subtitle {
+  color: #000000;
+  font-size: 1.1rem;
+}
+.project-ficha-body .right ul,
+.project-ficha-body dl,
+.iu-details dl {
+  margin-top: 15px;
+}
+
+.project-ficha-body dl dt,
+.iu-details dl dt {
+  font-weight: 700;
+}
+
+.project-ficha-body dd,
+.iu-details dd {
+  margin-left: 0.5rem;
+}
 
 
 /* Formulario de pestaña publicaciones */

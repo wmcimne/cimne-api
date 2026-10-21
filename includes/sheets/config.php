@@ -17,15 +17,99 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @return array
  */
 function cimne_sheets_get_sources() {
+    $cenit_spreadsheet_id = '1sSgLMlmaWTPSyaVZxSh2OETP--O9NevswQgc1RwWxyQ';
+
     $sources = array(
         'phd-theses' => array(
             'spreadsheet_id' => '1au3CsOYkxS2yLhYX-YTsc7XCGNzCBxsvGO5xO1tyxuM',
             'sheet_name'     => 'phd-theses',
             'range'          => 'A2:G',
         ),
+
+        /*
+         * CENIT contracts.
+         *
+         * One spreadsheet contains three tabs. Each tab is registered as an
+         * independent source so its cache key and Google Sheets request remain
+         * completely isolated from the other CENIT areas.
+         */
+        'cenit-urban-mobility' => array(
+            'spreadsheet_id' => $cenit_spreadsheet_id,
+            'sheet_name'     => 'urban-mobility',
+            'range'          => 'A2:I',
+        ),
+        'cenit-logistics-and-maritime-transport' => array(
+            'spreadsheet_id' => $cenit_spreadsheet_id,
+            'sheet_name'     => 'logistics-and-maritime-transport',
+            'range'          => 'A2:I',
+        ),
+        'cenit-infrastructure-management' => array(
+            'spreadsheet_id' => $cenit_spreadsheet_id,
+            'sheet_name'     => 'infrastructure-management',
+            'range'          => 'A2:I',
+        ),
     );
 
     return apply_filters( 'cimne_sheets_sources', $sources );
+}
+
+/**
+ * Registers a request-local Google Sheets source.
+ *
+ * This is useful for integrations where a trusted shortcode attribute maps
+ * directly to an existing rl-code / sheet tab. Runtime sources are available
+ * only during the current WordPress request and are never persisted.
+ *
+ * @param string $source_code Unique source code.
+ * @param array  $source      Source configuration.
+ * @return bool
+ */
+function cimne_sheets_register_runtime_source( $source_code, array $source ) {
+    $source_code = sanitize_key( (string) $source_code );
+
+    if ( '' === $source_code ) {
+        return false;
+    }
+
+    if ( ! isset( $GLOBALS['cimne_sheets_runtime_sources'] ) || ! is_array( $GLOBALS['cimne_sheets_runtime_sources'] ) ) {
+        $GLOBALS['cimne_sheets_runtime_sources'] = array();
+    }
+
+    $GLOBALS['cimne_sheets_runtime_sources'][ $source_code ] = $source;
+
+    return true;
+}
+
+/**
+ * Appends request-local sources to the normal source registry.
+ *
+ * @param array $sources Registered sources.
+ * @return array
+ */
+function cimne_sheets_append_runtime_sources( array $sources ) {
+    if ( empty( $GLOBALS['cimne_sheets_runtime_sources'] ) || ! is_array( $GLOBALS['cimne_sheets_runtime_sources'] ) ) {
+        return $sources;
+    }
+
+    foreach ( $GLOBALS['cimne_sheets_runtime_sources'] as $source_code => $source ) {
+        if ( ! is_array( $source ) ) {
+            continue;
+        }
+
+        $sources[ $source_code ] = $source;
+    }
+
+    return $sources;
+}
+add_filter( 'cimne_sheets_sources', 'cimne_sheets_append_runtime_sources', 20 );
+
+/**
+ * Returns the BEEGroup contracts spreadsheet ID.
+ *
+ * @return string
+ */
+function cimne_sheets_get_beegroup_spreadsheet_id() {
+    return '10pMxXzD0-c_uuiIy788Tbm49imFE4x5YatJi_gYdjO4';
 }
 
 /**

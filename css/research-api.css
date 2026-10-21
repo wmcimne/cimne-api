@@ -409,6 +409,19 @@
     text-decoration: none;
 }
 
+/* Cenint Projects List colors*/
+.cenit-projects-list .cimne-project-list .cimne-project-list__category {
+  color: #F3921A !important;
+}
+.cenit-projects-list .cimne-project-list__body .cimne-project-list__acronym,
+.cenit-projects-list .cimne-project-list__body .cimne-project-list__title {
+  color: #004996 !important;
+}
+.description-list .list-title span:first-child {
+  -webkit-text-decoration: capitalize;
+          text-decoration: capitalize;
+}
+
 @media (max-width: 1100px) {
     .cimne-research-staff__grid {
         grid-template-columns: repeat(2, minmax(220px, 1fr));
