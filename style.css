@@ -1476,7 +1476,11 @@ span.list-website {
   font-family: 'ETMODULES';
   content: '\4a';
   padding-left: 10px;
-} /*
+} 
+
+
+
+/*
 .project-ficha-back span.share-project::after {
   font-family: 'ETMODULES';
   content: '\e02c';
@@ -2224,6 +2228,8 @@ p.no-results {
    ABOUT
 ----------------------------------------------------------------*/
 
+
+
 /* Awards */
 .profile-in-awards {
   display: -webkit-box;
@@ -2277,6 +2283,15 @@ font-weight: 400;
   font-size: 16px;
   color: #02A0A5;
   font-weight: 600;
+}
+
+.profile-pic {
+  background-position: center;
+  background-size: cover;
+  border-radius: 50%;
+  min-width: 100px;
+  height: 100px;
+  border: 1px solid #02A0A5;
 }
 
 /*Staff profile*/

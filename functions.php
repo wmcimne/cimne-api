@@ -271,13 +271,13 @@ function cimne_enqueue_theme_scripts(): void {
 			cimne_asset_version( '/js/crypt.js' ),
 			$defer_args
 		);
-		wp_register_script(
-			'cimne-views',
-			$theme_uri . '/js/views.js',
-			array( 'cimne-locale', 'cimne-crypt' ),
-			cimne_asset_version( '/js/views.js' ),
-			$defer_args
-		);
+		// wp_register_script(
+		// 	'cimne-views',
+		// 	$theme_uri . '/js/views.js',
+		// 	array( 'cimne-locale', 'cimne-crypt' ),
+		// 	cimne_asset_version( '/js/views.js' ),
+		// 	$defer_args
+		// );
 	}
 
 	/*
@@ -290,15 +290,15 @@ function cimne_enqueue_theme_scripts(): void {
 	 * views.js
 	 * services.js
 	 */
-	if ( $uses_metrics_api ) {
-		wp_enqueue_script(
-			'cimne-services',
-			$theme_uri . '/js/services.js',
-			array( 'cimne-locale', 'cimne-crypt', 'cimne-views' ),
-			cimne_asset_version( '/js/services.js' ),
-			$defer_args
-		);
-	}
+	// if ( $uses_metrics_api ) {
+	// 	wp_enqueue_script(
+	// 		'cimne-services',
+	// 		$theme_uri . '/js/services.js',
+	// 		array( 'cimne-locale', 'cimne-crypt', 'cimne-views' ),
+	// 		cimne_asset_version( '/js/services.js' ),
+	// 		$defer_args
+	// 	);
+	// }
 
 	/*
 	 * Integración con Google Sheets.
@@ -310,15 +310,15 @@ function cimne_enqueue_theme_scripts(): void {
 	 * views.js
 	 * gsheets_data.js
 	 */
-	if ( $uses_google_sheets ) {
-		wp_enqueue_script(
-			'cimne-google-sheets',
-			$theme_uri . '/js/gsheets_data.js',
-			array( 'cimne-locale', 'cimne-crypt', 'cimne-views' ),
-			cimne_asset_version( '/js/gsheets_data.js' ),
-			$defer_args
-		);
-	}
+	// if ( $uses_google_sheets ) {
+	// 	wp_enqueue_script(
+	// 		'cimne-google-sheets',
+	// 		$theme_uri . '/js/gsheets_data.js',
+	// 		array( 'cimne-locale', 'cimne-crypt', 'cimne-views' ),
+	// 		cimne_asset_version( '/js/gsheets_data.js' ),
+	// 		$defer_args
+	// 	);
+	// }
 }
 
 add_action( 'wp_enqueue_scripts', 'cimne_enqueue_theme_scripts', 20 );

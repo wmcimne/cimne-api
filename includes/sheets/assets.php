@@ -96,3 +96,29 @@ function cimne_phd_theses_enqueue_assets() {
     );
 }
 add_action( 'wp_enqueue_scripts', 'cimne_phd_theses_enqueue_assets', 30 );
+
+/**
+ * Loads the dedicated OKO Card link mapper only on the OKO Card page.
+ *
+ * Google Sheets is never called from this JavaScript. PHP has already fetched,
+ * normalized and sanitized the matching row before the browser receives it.
+ *
+ * @return void
+ */
+function cimne_oko_card_enqueue_assets() {
+    if ( ! cimne_sheets_page_has_shortcode( 'cimne_oko_card_social' ) ) {
+        return;
+    }
+
+    wp_enqueue_script(
+        'cimne-oko-card',
+        get_stylesheet_directory_uri() . '/js/cimne-oko-card.js',
+        array(),
+        cimne_sheets_asset_version( '/js/cimne-oko-card.js' ),
+        array(
+            'strategy'  => 'defer',
+            'in_footer' => true,
+        )
+    );
+}
+add_action( 'wp_enqueue_scripts', 'cimne_oko_card_enqueue_assets', 30 );

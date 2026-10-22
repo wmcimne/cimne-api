@@ -60,6 +60,7 @@ $researcher_url = cimne_directory_profile_external_url( 'researcher_id', $resear
 $google_url = cimne_directory_profile_external_url( 'google_scholar', $google_scholar );
 
 $has_address = '' !== $address_line || '' !== $address_locality;
+
 ?>
 
 <div id="staff-profile-container">

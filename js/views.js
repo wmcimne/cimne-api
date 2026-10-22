@@ -969,7 +969,8 @@ const generateStaffProfileHTML = ({ IDSIGPro, Nombre, Apellido1, Apellido2, Emai
     Genera y descarga un archivo vCard (.vcf) con los datos de contacto
 ------------------------------------------------------------------*/
 function generarVCard() {
-
+ 
+    console.log("Generating vCard...");
     const data = document.querySelector('#download-profile');
     const nombre = data.getAttribute('data-name') || '';
     const apellido = data.getAttribute('data-surename') || '';

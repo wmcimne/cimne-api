@@ -17,13 +17,26 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @return array
  */
 function cimne_sheets_get_sources() {
+    $phd_spreadsheet_id   = '1au3CsOYkxS2yLhYX-YTsc7XCGNzCBxsvGO5xO1tyxuM';
     $cenit_spreadsheet_id = '1sSgLMlmaWTPSyaVZxSh2OETP--O9NevswQgc1RwWxyQ';
 
     $sources = array(
         'phd-theses' => array(
-            'spreadsheet_id' => '1au3CsOYkxS2yLhYX-YTsc7XCGNzCBxsvGO5xO1tyxuM',
+            'spreadsheet_id' => $phd_spreadsheet_id,
             'sheet_name'     => 'phd-theses',
             'range'          => 'A2:G',
+        ),
+
+        'researcher-awards' => array(
+            'spreadsheet_id' => $phd_spreadsheet_id,
+            'sheet_name'     => 'awards',
+            'range'          => 'A2:D',
+        ),
+
+        'oko-card' => array(
+            'spreadsheet_id' => '1dElHzsKJ-0FD6ut_2oxKJOYLcUca3lWQ63--H2mlCxM',
+            'sheet_name'     => 'oko-card',
+            'range'          => 'A2:E',
         ),
 
         /*

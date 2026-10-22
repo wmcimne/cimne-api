@@ -8,7 +8,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Whether the current singular page contains a Directory shortcode.
+ * Whether the current singular page contains the Directory listing component.
+ *
+ * Staff Profile assets are intentionally not detected here. The profile
+ * shortcode enqueues its own behavior when it actually renders.
  *
  * @return bool
  */
@@ -54,10 +57,6 @@ function cimne_directory_asset_version( $relative_path ) {
 /**
  * Enqueues Directory layout, filters and local filtering logic.
  *
- * directory-api.css is intentionally kept separate: Step 7B does not replace
- * the validated custom list layout. The new filter stylesheet only owns the
- * Search/Location/Role controls and hidden-state rules.
- *
  * @return void
  */
 function cimne_directory_enqueue_assets() {
@@ -102,3 +101,26 @@ function cimne_directory_enqueue_assets() {
     );
 }
 add_action( 'wp_enqueue_scripts', 'cimne_directory_enqueue_assets', 30 );
+
+/**
+ * Enqueues the Staff Profile behavior when [cimne_staff_profile] renders.
+ *
+ * The shortcode itself calls this function, so the decision does not depend
+ * on post_content inspection or on how Divi stores the module.
+ *
+ * @return void
+ */
+function cimne_directory_enqueue_staff_profile_asset() {
+    $script = '/js/cimne-staff-profile.js';
+
+    wp_enqueue_script(
+        'cimne-staff-profile',
+        get_stylesheet_directory_uri() . $script,
+        array(),
+        cimne_directory_asset_version( $script ),
+        array(
+            'strategy'  => 'defer',
+            'in_footer' => true,
+        )
+    );
+}

@@ -160,6 +160,15 @@ function cimne_staff_profile_shortcode() {
         return '<p class="cimne-directory-profile-message">' . esc_html__( 'Staff profile not available.', 'cimne' ) . '</p>';
     }
 
+    /*
+     * Load the profile behavior from the shortcode that actually renders the
+     * component. This is reliable inside Divi/global layouts because it does
+     * not depend on finding the shortcode in raw post_content.
+     */
+    if ( function_exists( 'cimne_directory_enqueue_staff_profile_asset' ) ) {
+        cimne_directory_enqueue_staff_profile_asset();
+    }
+
     ob_start();
 
     get_template_part(
