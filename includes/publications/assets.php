@@ -51,7 +51,8 @@ function cimne_publications_page_has_shortcode( $tag ) {
 function cimne_publications_enqueue_assets() {
     $uses_publications = cimne_publications_page_has_shortcode( 'cimne_publications' )
         || cimne_publications_page_has_shortcode( 'cimne_publications_filters' )
-        || cimne_publications_page_has_shortcode( 'cimne_research_publications' );
+        || cimne_publications_page_has_shortcode( 'cimne_research_publications' )
+        || cimne_publications_page_has_shortcode( 'cimne_onate_publications' );
 
     if ( ! $uses_publications ) {
         return;

@@ -11,6 +11,14 @@ if ( ! defined( 'CIMNE_PUBLICATIONS_PER_PAGE' ) ) {
     define( 'CIMNE_PUBLICATIONS_PER_PAGE', 12 );
 }
 
+if ( ! defined( 'CIMNE_ONATE_ORG_ID' ) ) {
+    define( 'CIMNE_ONATE_ORG_ID', 1491 );
+}
+
+if ( ! defined( 'CIMNE_ONATE_SCOPUS_ID' ) ) {
+    define( 'CIMNE_ONATE_SCOPUS_ID', '55147932200' );
+}
+
 /**
  * Returns the page size. Default 12 to match News and Events pagination.
  *
@@ -151,11 +159,11 @@ function cimne_publications_build_api_args( array $filters, $page = 1, $unit_cod
     }
 
     if ( '' !== $filters['from'] ) {
-        $args['date_from'] = $filters['from'];
+        $args['from'] = $filters['from'];
     }
 
     if ( '' !== $filters['to'] ) {
-        $args['date_to'] = $filters['to'];
+        $args['to'] = $filters['to'];
     }
 
     $author_unit = '' !== $unit_code ? $unit_code : $filters['cluster'];
@@ -211,6 +219,43 @@ function cimne_publications_get_page( array $filters = array(), $page = 1, $unit
         $args,
         array(
             'cache_variant' => 'publication-list-v2',
+            'transform'     => 'cimne_publications_normalize_payload',
+        )
+    );
+}
+
+
+/**
+ * Returns one Publications API page for a fixed CIMNE author.
+ *
+ * The upstream /publicaciones endpoint already accepts auth_org_id, which is
+ * also used by the Research Publications component after resolving personnel
+ * IDs from a research unit. Using the author org/person ID keeps filtering in
+ * the upstream API and preserves its pagination metadata.
+ *
+ * @param int $author_id CIMNE author org/person identifier.
+ * @param int $page      One-based page.
+ * @return array|WP_Error
+ */
+function cimne_publications_get_author_page( $author_id, $page = 1 ) {
+    $author_id = absint( $author_id );
+    $page      = max( 1, (int) $page );
+
+    if ( ! $author_id ) {
+        return new WP_Error( 'cimne_publications_invalid_author', 'A valid publication author ID is required.' );
+    }
+
+    $per_page = cimne_publications_per_page();
+
+    return cimne_api_get(
+        'publications',
+        array(
+            'limit'       => $per_page,
+            'offset'      => ( $page - 1 ) * $per_page,
+            'auth_org_id' => $author_id,
+        ),
+        array(
+            'cache_variant' => 'publication-author-list-v1',
             'transform'     => 'cimne_publications_normalize_payload',
         )
     );
@@ -342,6 +387,33 @@ function cimne_publications_get_research_context( $unit_code ) {
 }
 
 /**
+ * Builds the SSR context for a fixed author Publications list.
+ *
+ * @param int $author_id Author org/person identifier.
+ * @return array|WP_Error
+ */
+function cimne_publications_get_author_context( $author_id ) {
+    $author_id = absint( $author_id );
+    $payload   = cimne_publications_get_author_page( $author_id, 1 );
+
+    if ( is_wp_error( $payload ) ) {
+        return $payload;
+    }
+
+    $items = isset( $payload['items'] ) && is_array( $payload['items'] ) ? $payload['items'] : array();
+    $meta  = isset( $payload['meta'] ) && is_array( $payload['meta'] ) ? $payload['meta'] : array();
+
+    return array(
+        'context'         => 'author',
+        'unit_code'       => '',
+        'author_id'       => $author_id,
+        'initial_html'    => cimne_publications_render_items( $items ),
+        'pagination_html' => cimne_publications_render_pagination( 1, (int) ( $meta['pages'] ?? 0 ) ),
+        'total'           => (int) ( $meta['total'] ?? count( $items ) ),
+    );
+}
+
+/**
  * Renders the Publications shell.
  *
  * @param array $context Context.
@@ -410,3 +482,42 @@ function cimne_research_publications_shortcode() {
     return cimne_publications_render( $context );
 }
 add_shortcode( 'cimne_research_publications', 'cimne_research_publications_shortcode' );
+
+/**
+ * Eugenio Oñate Publications shortcode.
+ *
+ * Uses the fixed CIMNE author identity currently exposed by /publicaciones:
+ * - org_id: 1491
+ * - Scopus author ID: 55147932200
+ *
+ * The API request itself uses auth_org_id=1491, matching the filtering
+ * mechanism already used by the Publications module for research-unit staff.
+ *
+ * Shortcode: [cimne_onate_publications]
+ *
+ * @return string
+ */
+function cimne_onate_publications_shortcode() {
+    if ( is_admin() && ! wp_doing_ajax() ) {
+        return '';
+    }
+
+    $context = cimne_publications_get_author_context( CIMNE_ONATE_ORG_ID );
+
+    if ( is_wp_error( $context ) ) {
+        cimne_api_log(
+            'Eugenio Oñate Publications component could not be rendered.',
+            array(
+                'author_id'   => CIMNE_ONATE_ORG_ID,
+                'scopus_id'   => CIMNE_ONATE_SCOPUS_ID,
+                'error_code'  => $context->get_error_code(),
+            )
+        );
+
+        return '<p class="no-publications">' . esc_html__( 'Unable to load publications.', 'cimne' ) . '</p>';
+    }
+
+    return cimne_publications_render( $context );
+}
+add_shortcode( 'cimne_onate_publications', 'cimne_onate_publications_shortcode' );
+

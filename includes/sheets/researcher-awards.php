@@ -148,3 +148,84 @@ function cimne_researcher_awards_shortcode() {
     return cimne_sheets_render_researcher_awards( $researchers );
 }
 add_shortcode( 'cimne_researcher_awards', 'cimne_researcher_awards_shortcode' );
+
+/**
+ * Returns Eugenio Oñate's awards from the normalized researcher-awards data.
+ *
+ * The same cached Google Sheets dataset used by [cimne_researcher_awards] is
+ * reused; no second Sheets request is made for this shortcode.
+ *
+ * @return array|WP_Error
+ */
+function cimne_sheets_get_onate_awards() {
+    $researchers = cimne_sheets_get_researcher_awards();
+
+    if ( is_wp_error( $researchers ) ) {
+        return $researchers;
+    }
+
+    foreach ( $researchers as $researcher ) {
+        $name = isset( $researcher['name'] ) ? (string) $researcher['name'] : '';
+        $key  = strtolower( remove_accents( $name ) );
+
+        if ( false !== strpos( $key, 'onate' ) ) {
+            return isset( $researcher['awards'] ) && is_array( $researcher['awards'] )
+                ? $researcher['awards']
+                : array();
+        }
+    }
+
+    return array();
+}
+
+/**
+ * Renders Eugenio Oñate's awards using the compact legacy-compatible layout.
+ *
+ * @param array $awards Award strings.
+ * @return string
+ */
+function cimne_sheets_render_onate_awards( array $awards ) {
+    ob_start();
+
+    get_template_part(
+        'template-parts/sheets/onate-awards',
+        null,
+        array(
+            'awards' => $awards,
+        )
+    );
+
+    return (string) ob_get_clean();
+}
+
+/**
+ * Shortcode: [cimne_onate_awards]
+ *
+ * Intended for the Eugenio Oñate founder page. It reproduces the compact
+ * legacy mode that showed only the founder's award list, without duplicating
+ * the full researcher card used on /about/awards/.
+ *
+ * @return string
+ */
+function cimne_onate_awards_shortcode() {
+    if ( is_admin() && ! wp_doing_ajax() ) {
+        return '';
+    }
+
+    $awards = cimne_sheets_get_onate_awards();
+
+    if ( is_wp_error( $awards ) ) {
+        cimne_sheets_log(
+            'Eugenio Oñate Awards component could not be rendered.',
+            array(
+                'error_code' => $awards->get_error_code(),
+            )
+        );
+
+        return '<p class="no-results">' . esc_html__( 'Unable to load awards at this time.', 'cimne' ) . '</p>';
+    }
+
+    return cimne_sheets_render_onate_awards( $awards );
+}
+add_shortcode( 'cimne_onate_awards', 'cimne_onate_awards_shortcode' );
+
