@@ -166,14 +166,7 @@ function cimne_page_uses_metrics_api(): bool {
 	return cimne_current_content_contains( 'id="api-call"' ) || cimne_current_content_contains( "id='api-call'" );
 }
 
-/**
- * Indica si la página utiliza datos procedentes de Google Sheets.
- *
- * @return bool
- */
-function cimne_page_uses_google_sheets(): bool {
-	return cimne_current_content_contains( 'id="gsheets-call"' ) || cimne_current_content_contains( "id='gsheets-call'" );
-}
+
 
 /**
  * Indica si la página contiene una inicialización de Slick Carousel.
@@ -208,7 +201,6 @@ function cimne_enqueue_theme_scripts(): void {
 	$theme_uri = get_stylesheet_directory_uri();
 	$uses_slick = cimne_page_uses_slick();
 	$uses_metrics_api = cimne_page_uses_metrics_api();
-	$uses_google_sheets = cimne_page_uses_google_sheets();
 	$defer_args = array(
 		'strategy' => 'defer',
 		'in_footer' => true,
@@ -256,7 +248,7 @@ function cimne_enqueue_theme_scripts(): void {
 	 * Solo se registran si la página utiliza al menos una de estas
 	 * funcionalidades.
 	 */
-	if ( $uses_metrics_api || $uses_google_sheets ) {
+	if ( $uses_metrics_api ) {
 		wp_register_script(
 			'cimne-locale',
 			$theme_uri . '/js/locale.js',
@@ -301,24 +293,7 @@ function cimne_enqueue_theme_scripts(): void {
 	// }
 
 	/*
-	 * Integración con Google Sheets.
-	 *
-	 * Orden resultante:
-	 *
-	 * locale.js
-	 * crypt.js
-	 * views.js
-	 * gsheets_data.js
-	 */
-	// if ( $uses_google_sheets ) {
-	// 	wp_enqueue_script(
-	// 		'cimne-google-sheets',
-	// 		$theme_uri . '/js/gsheets_data.js',
-	// 		array( 'cimne-locale', 'cimne-crypt', 'cimne-views' ),
-	// 		cimne_asset_version( '/js/gsheets_data.js' ),
-	// 		$defer_args
-	// 	);
-	// }
+
 }
 
 add_action( 'wp_enqueue_scripts', 'cimne_enqueue_theme_scripts', 20 );
