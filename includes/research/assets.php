@@ -125,8 +125,6 @@ function cimne_research_enqueue_assets() {
             'filtersApplied'         => __( 'Filters applied.', 'cimne' ),
             'filtersCleared'         => __( 'Filters cleared.', 'cimne' ),
             'projectUrlCopied'       => __( 'Project URL copied.', 'cimne' ),
-            'emailCopied'            => __( 'Email copied', 'cimne' ),
-            'emailCopiedStatus'      => __( 'Email copied.', 'cimne' ),
         )
     );
 }

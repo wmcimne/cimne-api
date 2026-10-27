@@ -143,39 +143,6 @@ function cimne_get_current_post_content(): string {
 }
 
 /**
- * Comprueba si el contenido actual contiene una cadena determinada.
- *
- * @param string $search Cadena que se quiere localizar.
- *
- * @return bool
- */
-function cimne_current_content_contains( string $search ): bool {
-	if ( '' === $search ) {
-		return false;
-	}
-
-	return false !== strpos( cimne_get_current_post_content(), $search );
-}
-
-/**
- * Indica si la página utiliza la API de métricas de CIMNE.
- *
- * @return bool
- */
-function cimne_page_uses_metrics_api(): bool {
-	return cimne_current_content_contains( 'id="api-call"' ) || cimne_current_content_contains( "id='api-call'" );
-}
-
-/**
- * Indica si la página utiliza datos procedentes de Google Sheets.
- *
- * @return bool
- */
-function cimne_page_uses_google_sheets(): bool {
-	return cimne_current_content_contains( 'id="gsheets-call"' ) || cimne_current_content_contains( "id='gsheets-call'" );
-}
-
-/**
  * Indica si la página contiene una inicialización de Slick Carousel.
  *
  * Detecta código insertado en el contenido de Divi, normalmente dentro
@@ -196,19 +163,16 @@ function cimne_page_uses_slick(): bool {
 }
 
 /**
- * Registra y carga los scripts del tema hijo.
+ * Registra y carga los scripts globales del tema hijo.
  *
- * Los scripts comunes de la API de métricas y Google Sheets se registran
- * una sola vez. WordPress carga automáticamente sus dependencias cuando
- * se encola el script final correspondiente.
+ * Slick se carga de forma condicional cuando el contenido actual lo utiliza.
+ * El resto de componentes API gestionan sus propios assets desde sus módulos.
  *
  * @return void
  */
 function cimne_enqueue_theme_scripts(): void {
 	$theme_uri = get_stylesheet_directory_uri();
 	$uses_slick = cimne_page_uses_slick();
-	$uses_metrics_api = cimne_page_uses_metrics_api();
-	$uses_google_sheets = cimne_page_uses_google_sheets();
 	$defer_args = array(
 		'strategy' => 'defer',
 		'in_footer' => true,
@@ -249,76 +213,6 @@ function cimne_enqueue_theme_scripts(): void {
 		cimne_asset_version( '/js/functions.js' ),
 		$defer_args
 	);
-
-	/*
-	 * Scripts comunes para la API de métricas y Google Sheets.
-	 *
-	 * Solo se registran si la página utiliza al menos una de estas
-	 * funcionalidades.
-	 */
-	if ( $uses_metrics_api || $uses_google_sheets ) {
-		wp_register_script(
-			'cimne-locale',
-			$theme_uri . '/js/locale.js',
-			array(),
-			cimne_asset_version( '/js/locale.js' ),
-			$defer_args
-		);
-		wp_register_script(
-			'cimne-crypt',
-			$theme_uri . '/js/crypt.js',
-			array(),
-			cimne_asset_version( '/js/crypt.js' ),
-			$defer_args
-		);
-		// wp_register_script(
-		// 	'cimne-views',
-		// 	$theme_uri . '/js/views.js',
-		// 	array( 'cimne-locale', 'cimne-crypt' ),
-		// 	cimne_asset_version( '/js/views.js' ),
-		// 	$defer_args
-		// );
-	}
-
-	/*
-	 * API de métricas.
-	 *
-	 * Orden resultante:
-	 *
-	 * locale.js
-	 * crypt.js
-	 * views.js
-	 * services.js
-	 */
-	// if ( $uses_metrics_api ) {
-	// 	wp_enqueue_script(
-	// 		'cimne-services',
-	// 		$theme_uri . '/js/services.js',
-	// 		array( 'cimne-locale', 'cimne-crypt', 'cimne-views' ),
-	// 		cimne_asset_version( '/js/services.js' ),
-	// 		$defer_args
-	// 	);
-	// }
-
-	/*
-	 * Integración con Google Sheets.
-	 *
-	 * Orden resultante:
-	 *
-	 * locale.js
-	 * crypt.js
-	 * views.js
-	 * gsheets_data.js
-	 */
-	// if ( $uses_google_sheets ) {
-	// 	wp_enqueue_script(
-	// 		'cimne-google-sheets',
-	// 		$theme_uri . '/js/gsheets_data.js',
-	// 		array( 'cimne-locale', 'cimne-crypt', 'cimne-views' ),
-	// 		cimne_asset_version( '/js/gsheets_data.js' ),
-	// 		$defer_args
-	// 	);
-	// }
 }
 
 add_action( 'wp_enqueue_scripts', 'cimne_enqueue_theme_scripts', 20 );
@@ -330,6 +224,13 @@ add_action( 'wp_enqueue_scripts', 'cimne_enqueue_theme_scripts', 20 );
 require_once get_stylesheet_directory() . '/includes/api/cache.php';
 require_once get_stylesheet_directory() . '/includes/api/client.php';
 require_once get_stylesheet_directory() . '/includes/api/normalizers.php';
+
+
+/*================================================
+# Shared Staff component - Cards, profile links and copy-email behavior
+================================================*/
+
+require_once get_stylesheet_directory() . '/includes/staff/bootstrap.php';
 
 
 /*================================================

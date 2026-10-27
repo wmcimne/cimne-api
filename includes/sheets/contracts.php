@@ -285,13 +285,11 @@ function cimne_sheets_get_beegroup_source_for_area( $area ) {
 /**
  * Shortcode: [cimne_beegroup_contracts area="..."]
  *
- * The area value must be the exact rl-code used by the legacy gsheets-call
- * marker. This keeps every existing BEEGroup page compatible without coupling
- * the PHP module to WordPress page slugs or WPML translations.
+ * The area value must match the configured contract area code exactly.
+ * This keeps BEEGroup pages independent from WordPress page slugs and WPML
+ * translations.
  *
- * Example migration:
- * <div id="gsheets-call" sheet-code="building-energy-and-environment-beegroup" rl-code="my-area"></div>
- * becomes:
+ * Example:
  * [cimne_beegroup_contracts area="my-area"]
  *
  * @param array $atts Shortcode attributes.

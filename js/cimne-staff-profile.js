@@ -28,34 +28,11 @@
     const decodeProfileEmail = (profile) => {
         const emailElement = profile.querySelector('.staff-email.copy-email-to-clipboard');
 
-        if (!emailElement) {
+        if (!window.CIMNEStaff || typeof window.CIMNEStaff.decodeEmailElement !== 'function') {
             return '';
         }
 
-        const storedValue = String(emailElement.id || '').trim();
-
-        if (!storedValue) {
-            return '';
-        }
-
-        // Accept a plain email if the Directory markup changes in the future.
-        if (storedValue.includes('@')) {
-            return storedValue;
-        }
-
-        // Current Directory markup stores base64(email) + "c" in the ID.
-        const encodedValue = storedValue.slice(0, -1);
-
-        if (!encodedValue) {
-            return '';
-        }
-
-        try {
-            return atob(encodedValue);
-        } catch (error) {
-            console.warn('[CIMNE Staff Profile] Unable to decode profile email.', error);
-            return '';
-        }
+        return window.CIMNEStaff.decodeEmailElement(emailElement);
     };
 
     const getPosition = (profile) => {
@@ -178,20 +155,15 @@
             return;
         }
 
-        const trigger = target.closest(TRIGGER_SELECTOR);
+        const vCardTrigger = target.closest(TRIGGER_SELECTOR);
 
-        if (!trigger) {
+        if (vCardTrigger) {
+            event.preventDefault();
+            event.stopPropagation();
+            downloadVCard();
             return;
         }
-
-        event.preventDefault();
-        event.stopPropagation();
-
-        downloadVCard();
     };
 
     document.addEventListener('click', handleDocumentClick);
-
-    // Temporary compatibility until the legacy vCard caller is removed.
-    window.generarVCard = downloadVCard;
 })();

@@ -45,33 +45,23 @@ $unit_code = isset( $args['research_unit_code'] ) ? (string) $args['research_uni
                         continue;
                     }
                     ?>
-                    <article class="cimne-research-staff__card">
-                        <h4 class="cimne-research-staff__name"><?php echo esc_html( $name ); ?></h4>
-
-                        <div class="cimne-research-staff__contact">
-                            <span class="cimne-research-staff__icon" aria-hidden="true">
-                                <svg viewBox="0 0 24 24" focusable="false"><path d="M6.6 10.8c1.7 3.3 3.3 4.9 6.6 6.6l2.2-2.2c.3-.3.7-.4 1.1-.2 1.2.4 2.5.6 3.8.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.8 21 3 13.2 3 3.7c0-.6.4-1 1-1h3.4c.6 0 1 .4 1 1 0 1.3.2 2.6.6 3.8.1.4 0 .8-.3 1.1l-2.1 2.2Z"/></svg>
-                            </span>
-                            <span><?php echo esc_html( '' !== $phone ? $phone : __( 'No phone', 'cimne' ) ); ?></span>
-                        </div>
-
-                        <?php if ( '' !== $email ) : ?>
-                            <button
-                                type="button"
-                                class="cimne-research-staff__copy-email"
-                                data-copy-email="<?php echo esc_attr( $email ); ?>"
-                            >
-                                <span class="cimne-research-staff__icon" aria-hidden="true">
-                                    <svg viewBox="0 0 24 24" focusable="false"><path d="M3 5h18v14H3V5Zm2 2v.5l7 5 7-5V7H5Zm14 10V10l-7 5-7-5v7h14Z"/></svg>
-                                </span>
-                                <span data-copy-label><?php echo esc_html__( 'Copy email', 'cimne' ); ?></span>
-                            </button>
-                        <?php endif; ?>
-                    </article>
+                    <?php
+                    get_template_part(
+                        'template-parts/staff/person-card',
+                        null,
+                        array(
+                            'person' => array(
+                                'person_id' => isset( $person['person_id'] ) ? $person['person_id'] : '',
+                                'full_name' => $name,
+                                'phone'     => $phone,
+                                'email'     => $email,
+                            ),
+                        )
+                    );
+                    ?>
                 <?php endforeach; ?>
             </div>
         </section>
     <?php endforeach; ?>
 
-    <span class="screen-reader-text" aria-live="polite" data-cimne-copy-status></span>
 </div>

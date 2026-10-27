@@ -85,7 +85,7 @@ function cimne_directory_enqueue_assets() {
     wp_enqueue_script(
         'cimne-directory',
         get_stylesheet_directory_uri() . $script,
-        array(),
+        array( 'cimne-staff' ),
         cimne_directory_asset_version( $script ),
         true
     );
@@ -116,11 +116,12 @@ function cimne_directory_enqueue_staff_profile_asset() {
     wp_enqueue_script(
         'cimne-staff-profile',
         get_stylesheet_directory_uri() . $script,
-        array(),
+        array( 'cimne-staff' ),
         cimne_directory_asset_version( $script ),
         array(
             'strategy'  => 'defer',
             'in_footer' => true,
         )
     );
+
 }

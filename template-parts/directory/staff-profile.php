@@ -50,10 +50,6 @@ $researcher_id = isset( $person['researcher_id'] ) ? trim( (string) $person['res
 $google_scholar = isset( $person['google_scholar'] ) ? trim( (string) $person['google_scholar'] ) : '';
 $cv = isset( $person['cv'] ) ? trim( (string) $person['cv'] ) : '';
 
-$email_id = function_exists( 'cimne_directory_email_element_id' )
-    ? cimne_directory_email_element_id( $email )
-    : '';
-
 $scopus_url = cimne_directory_profile_external_url( 'scopus', $scopus_id );
 $orcid_url = cimne_directory_profile_external_url( 'orcid', $orcid );
 $researcher_url = cimne_directory_profile_external_url( 'researcher_id', $researcher_id );
@@ -93,12 +89,13 @@ $has_address = '' !== $address_line || '' !== $address_locality;
                 <div class="staff-profile-header-info">
                     <h4 class="staff-profile-header-name"><?php echo esc_html( $full_name ); ?></h4>
 
-                    <?php if ( '' !== $email && '' !== $email_id ) : ?>
-                        <p
-                            id="<?php echo esc_attr( $email_id ); ?>"
-                            class="staff-email copy-email-to-clipboard"
-                        ><?php echo esc_html__( 'Copy email', 'cimne' ); ?></p>
-                    <?php endif; ?>
+                    <?php
+                    get_template_part(
+                        'template-parts/staff/copy-email',
+                        null,
+                        array( 'email' => $email )
+                    );
+                    ?>
 
                     <?php if ( '' !== $phone ) : ?>
                         <p class="staff-profile-header-tlf"><?php echo esc_html( $phone ); ?></p>

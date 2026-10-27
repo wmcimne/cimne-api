@@ -63,8 +63,10 @@
 
     function initPublications(component) {
         var listUrl = component.getAttribute('data-list-url') || '';
-        var context = component.getAttribute('data-publications-context') === 'research' ? 'research' : 'global';
+        var rawContext = component.getAttribute('data-publications-context') || 'global';
+        var context = rawContext === 'research' || rawContext === 'author' ? rawContext : 'global';
         var unit = component.getAttribute('data-unit-code') || '';
+        var authorId = component.getAttribute('data-author-id') || '';
         var results = component.querySelector('[data-publications-results]');
         var pagination = component.querySelector('[data-publications-pagination]');
         var status = component.querySelector('[data-publications-status]');
@@ -136,6 +138,8 @@
 
             if (context === 'research') {
                 params.unit = unit;
+            } else if (context === 'author') {
+                params.author_id = authorId;
             } else {
                 params.search = appliedFilters.search;
                 params.cluster = appliedFilters.cluster;

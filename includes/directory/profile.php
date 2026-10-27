@@ -169,6 +169,11 @@ function cimne_staff_profile_shortcode() {
         cimne_directory_enqueue_staff_profile_asset();
     }
 
+    $back_url = wp_get_referer();
+    if ( ! $back_url ) {
+        $back_url = cimne_directory_index_url();
+    }
+
     ob_start();
 
     get_template_part(
@@ -176,7 +181,7 @@ function cimne_staff_profile_shortcode() {
         null,
         array(
             'person'            => $person,
-            'back_url'          => cimne_directory_index_url(),
+            'back_url'          => $back_url,
             'placeholder_image' => cimne_directory_profile_placeholder_image_url(),
         )
     );

@@ -31,59 +31,9 @@
     align-items: stretch;
 }
 
-.cimne-research-staff__card {
-    border: 1px solid var(--cimne-research-teal);
-    padding: 10px 10px 12px;
-    min-height: 102px;
-}
-
-.cimne-research-staff__name {
-    margin: 0 0 7px;
-    padding-bottom: 5px;
-    border-bottom: 1px solid var(--cimne-research-line);
-    color: var(--cimne-research-teal);
-    font-size: 14px;
-    font-weight: 700;
-    line-height: 1.25;
-}
-
-.cimne-research-staff__contact,
-.cimne-research-staff__copy-email {
-    display: flex;
-    gap: 9px;
-    align-items: center;
-    min-height: 23px;
-    font: inherit;
-    font-size: 14px;
-    color: var(--cimne-research-text);
-}
-
-.cimne-research-staff__copy-email {
-    appearance: none;
-    width: 100%;
-    padding: 0;
-    border: 0;
-    background: transparent;
-    text-align: left;
-    cursor: pointer;
-}
-
-.cimne-research-staff__copy-email:hover,
-.cimne-research-staff__copy-email:focus-visible {
-    color: var(--cimne-research-teal);
-}
-
-.cimne-research-staff__icon {
-    display: inline-flex;
-    width: 15px;
-    height: 15px;
-    flex: 0 0 15px;
-}
-
-.cimne-research-staff__icon svg {
-    width: 100%;
-    height: 100%;
-    fill: currentColor;
+.cimne-research-staff__grid .staff-item {
+    width: auto;
+    margin: 0;
 }
 
 /* Projects shell

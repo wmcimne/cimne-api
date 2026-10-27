@@ -1,6 +1,7 @@
 (function () {
     'use strict';
 
+
     function normalise(value) {
         return String(value || '')
             .toLowerCase()
@@ -168,7 +169,6 @@
 
     function init() {
         var filters = document.querySelectorAll('[data-cimne-directory-filters]');
-
         filters.forEach(initDirectoryFilters);
     }
 

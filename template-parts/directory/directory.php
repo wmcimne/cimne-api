@@ -25,9 +25,9 @@ $people = isset( $args['people'] ) && is_array( $args['people'] )
             <?php
             foreach ( $people as $person ) {
                 get_template_part(
-                    'template-parts/directory/person-card',
+                    'template-parts/staff/person-card',
                     null,
-                    array( 'person' => $person )
+                    cimne_directory_person_card_args( $person )
                 );
             }
             ?>

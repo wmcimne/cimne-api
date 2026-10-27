@@ -8,7 +8,8 @@
  * - The responsible person of each displayed unit is shown first under
  *   "Group Leaders".
  * - Group Leaders are excluded from every other role section.
- * - Remaining people are grouped by role.
+ * - Remaining people are grouped by role and displayed using the approved
+ *   editorial category order.
  * - Duplicate person+role combinations are removed.
  */
 
@@ -53,6 +54,63 @@ function cimne_research_staff_role_heading( $role_description, $role_code = '' )
     $role_code = trim( (string) $role_code );
 
     return '' !== $role_code ? $role_code : __( 'Staff', 'cimne' );
+}
+
+
+/**
+ * Returns the editorial display order for Research Staff role sections.
+ *
+ * Group Leaders are handled separately and are always inserted first.
+ * Any role not included in this list is displayed after the known roles,
+ * preserving the order in which it was first received from the API.
+ *
+ * @return array<string,int> Normalized role label => zero-based priority.
+ */
+function cimne_research_staff_category_order() {
+    $categories = array(
+        'Senior Distinguished Researcher',
+        'Full Research Professor',
+        'Associate Research Professor',
+        'Senior Innovation Leader',
+        'Assistant Research Professor',
+        'Innovation Leader',
+        'Post Doc',
+        'Innovation Developer',
+        'PHD Student',
+        'Master Student',
+        'Innovation Trainee',
+        'Research Engineer',
+        'Staff Scientist',
+        'Undergraduate Students',
+        'Visiting Scientist',
+    );
+
+    $order = array();
+
+    foreach ( $categories as $index => $category ) {
+        $key = strtoupper( remove_accents( $category ) );
+        $order[ $key ] = $index;
+    }
+
+    return $order;
+}
+
+/**
+ * Returns the sorting priority for one Research Staff role heading.
+ *
+ * @param string $heading Clean role heading.
+ * @return int
+ */
+function cimne_research_staff_category_priority( $heading ) {
+    static $order = null;
+
+    if ( null === $order ) {
+        $order = cimne_research_staff_category_order();
+    }
+
+    $key = strtoupper( remove_accents( trim( (string) $heading ) ) );
+
+    return isset( $order[ $key ] ) ? (int) $order[ $key ] : PHP_INT_MAX;
 }
 
 /**
@@ -115,14 +173,12 @@ function cimne_research_group_staff_by_role( array $units, array $excluded_ident
 
             if ( ! isset( $groups[ $group_key ] ) ) {
                 $groups[ $group_key ] = array(
-                    'label'     => $heading,
-                    'role_code' => $role_code,
-                    'priority'  => ! empty( $person['is_pi'] ) ? 0 : 10,
-                    'order'     => $order++,
-                    'people'    => array(),
+                    'label'             => $heading,
+                    'role_code'         => $role_code,
+                    'category_priority' => cimne_research_staff_category_priority( $heading ),
+                    'order'             => $order++,
+                    'people'            => array(),
                 );
-            } elseif ( ! empty( $person['is_pi'] ) ) {
-                $groups[ $group_key ]['priority'] = 0;
             }
 
             $groups[ $group_key ]['people'][] = array(
@@ -149,8 +205,11 @@ function cimne_research_group_staff_by_role( array $units, array $excluded_ident
     usort(
         $groups,
         static function ( $a, $b ) {
-            if ( (int) $a['priority'] !== (int) $b['priority'] ) {
-                return (int) $a['priority'] <=> (int) $b['priority'];
+            $a_priority = isset( $a['category_priority'] ) ? (int) $a['category_priority'] : PHP_INT_MAX;
+            $b_priority = isset( $b['category_priority'] ) ? (int) $b['category_priority'] : PHP_INT_MAX;
+
+            if ( $a_priority !== $b_priority ) {
+                return $a_priority <=> $b_priority;
             }
 
             return (int) $a['order'] <=> (int) $b['order'];
@@ -230,11 +289,11 @@ function cimne_research_get_staff_context( $code ) {
         array_unshift(
             $role_groups,
             array(
-                'label'     => __( 'Group Leaders', 'cimne' ),
-                'role_code' => 'RESPONSIBLE',
-                'priority'  => -100,
-                'order'     => -100,
-                'people'    => $leader_cards,
+                'label'             => __( 'Group Leaders', 'cimne' ),
+                'role_code'         => 'RESPONSIBLE',
+                'category_priority' => -100,
+                'order'             => -100,
+                'people'            => $leader_cards,
             )
         );
     }
@@ -298,6 +357,10 @@ function cimne_research_staff_shortcode() {
         );
 
         return '';
+    }
+
+    if ( function_exists( 'cimne_staff_enqueue_asset' ) ) {
+        cimne_staff_enqueue_asset();
     }
 
     return cimne_research_render_staff( $context );

@@ -741,38 +741,7 @@
             return;
         }
 
-        var copyButton = event.target.closest('[data-copy-email]');
 
-        if (!copyButton) {
-            return;
-        }
-
-        event.preventDefault();
-
-        var email = copyButton.getAttribute('data-copy-email') || '';
-        var label = copyButton.querySelector('[data-copy-label]');
-        var original = label ? label.textContent : '';
-        var root = copyButton.closest('.cimne-research-staff');
-        var live = root ? root.querySelector('[data-cimne-copy-status]') : null;
-
-        if (!email) {
-            return;
-        }
-
-        copyText(email).then(function () {
-            if (label) {
-                label.textContent = translate('emailCopied', 'Email copied');
-            }
-            if (live) {
-                live.textContent = translate('emailCopiedStatus', 'Email copied.');
-            }
-
-            window.setTimeout(function () {
-                if (label) {
-                    label.textContent = original;
-                }
-            }, 1800);
-        });
     });
 
     document.querySelectorAll('[data-cimne-projects]').forEach(initProjects);
