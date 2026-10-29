@@ -56,6 +56,50 @@ function cimne_directory_clean_role_label( $label ) {
 
 
 /**
+ * Returns the public-facing CIMNE role label.
+ *
+ * PSR staff use "Research Support Staff" instead of the generic API label
+ * "Staff". When the relation has es_ip=1, the public Manager suffix is added.
+ *
+ * Examples:
+ * - PSR + Staff + es_ip=0 => Research Support Staff.
+ * - PSR + Staff + es_ip=1 => Research Support Staff Manager.
+ * - non-PSR + Staff       => Staff.
+ *
+ * Any PSR role other than Staff / Staff Manager keeps its existing label.
+ * The Manager suffix is still added when es_ip=1, preserving the current
+ * Directory rule for PSR managers.
+ *
+ * @param string $role_description Raw or normalized role label.
+ * @param bool   $is_psr           Whether the person belongs to PSR.
+ * @param bool   $is_manager       Whether the relation has es_ip=1.
+ * @return string
+ */
+function cimne_directory_public_role_label( $role_description, $is_psr = false, $is_manager = false ) {
+    $role_description = cimne_directory_clean_role_label( $role_description );
+
+    if ( '' === $role_description ) {
+        return '';
+    }
+
+    if ( ! $is_psr ) {
+        return $role_description;
+    }
+
+    if ( 0 === strcasecmp( $role_description, 'Staff' ) ) {
+        $role_description = 'Research Support Staff';
+    } elseif ( 0 === strcasecmp( $role_description, 'Staff Manager' ) ) {
+        $role_description = 'Research Support Staff Manager';
+    }
+
+    if ( $is_manager && ! preg_match( '/\bmanager\s*$/iu', $role_description ) ) {
+        $role_description .= ' Manager';
+    }
+
+    return $role_description;
+}
+
+/**
  * Normalizes public role display items from the curated override format.
  *
  * Each item may contain a political/management role (rol_pol), a normal CIMNE
@@ -241,8 +285,10 @@ function cimne_directory_normalize_unit_roles( array $person ) {
  * Builds public role labels from API data using the Directory rules.
  *
  * Rules:
- * - PSR + es_ip=0: rol_desc.
- * - PSR + es_ip=1: rol_desc + " Manager".
+ * - PSR + Staff + es_ip=0: Research Support Staff.
+ * - PSR + Staff + es_ip=1: Research Support Staff Manager.
+ * - PSR roles other than Staff keep their role description; if es_ip=1,
+ *   the Manager suffix is appended.
  * - non-PSR: rol_desc.
  * - [CL] Academic Leader remains excluded from the public position label.
  *
@@ -272,12 +318,14 @@ function cimne_directory_api_display_roles( array $person, array $unit_roles ) {
             continue;
         }
 
-        if ( $is_psr && ! empty( $role['is_ip'] ) ) {
-            // Avoid accidental "Manager Manager" if the source label already
-            // includes the public suffix.
-            if ( ! preg_match( '/\bmanager\s*$/iu', $role_description ) ) {
-                $role_description .= ' Manager';
-            }
+        $role_description = cimne_directory_public_role_label(
+            $role_description,
+            $is_psr,
+            ! empty( $role['is_ip'] )
+        );
+
+        if ( '' === $role_description ) {
+            continue;
         }
 
         $key = function_exists( 'remove_accents' )
@@ -330,16 +378,43 @@ function cimne_directory_get_display_category( array $person, array $unit_roles 
         )
     );
 
-    $category = cimne_directory_clean_role_label( $category );
+    $is_psr = ! empty(
+        cimne_directory_value(
+            $person,
+            array( 'esPSR', 'is_psr' ),
+            false
+        )
+    );
+
+    $is_manager = false;
+
+    foreach ( $unit_roles as $role ) {
+        if ( is_array( $role ) && ! empty( $role['is_ip'] ) ) {
+            $is_manager = true;
+            break;
+        }
+    }
+
+    $category = cimne_directory_public_role_label(
+        $category,
+        $is_psr,
+        $is_manager
+    );
 
     if ( '' !== $category ) {
         return $category;
     }
 
     foreach ( $unit_roles as $role ) {
-        if ( ! empty( $role['role_description'] ) ) {
-            return (string) $role['role_description'];
+        if ( empty( $role['role_description'] ) ) {
+            continue;
         }
+
+        return cimne_directory_public_role_label(
+            $role['role_description'],
+            $is_psr,
+            ! empty( $role['is_ip'] )
+        );
     }
 
     return '';
@@ -695,6 +770,14 @@ function cimne_directory_profile_positions( array $person ) {
         return array();
     }
 
+    $is_psr = ! empty(
+        cimne_directory_value(
+            $person,
+            array( 'esPSR', 'is_psr' ),
+            false
+        )
+    );
+
     $positions = array();
     $seen = array();
 
@@ -722,7 +805,17 @@ function cimne_directory_profile_positions( array $person ) {
             continue;
         }
 
-        $position = cimne_directory_clean_role_label( $raw_description );
+        $position = cimne_directory_public_role_label(
+            $raw_description,
+            $is_psr,
+            ! empty(
+                cimne_directory_value(
+                    $role,
+                    array( 'es_ip', 'is_ip', 'ip' ),
+                    false
+                )
+            )
+        );
 
         if ( '' === $position ) {
             continue;

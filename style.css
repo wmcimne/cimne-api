@@ -1739,6 +1739,10 @@ details[open] summary::after {
 /* details */
 details {
   padding: 10px;
+
+}
+.awards details {
+
   border-bottom: 1px solid #444444;
 }
 details[open] {

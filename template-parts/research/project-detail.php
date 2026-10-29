@@ -103,11 +103,9 @@ $more_information = array_filter(
             <?php if ( $pi && ! empty( $pi['name'] ) ) : ?>
                 <?php $has_photo = ! empty( $pi['photo_url'] ); ?>
                 <div class="cimne-project-detail__pi <?php echo $has_photo ? 'cimne-project-detail__pi--has-photo' : 'cimne-project-detail__pi--no-photo'; ?>">
-                    <?php if ( $has_photo ) : ?>
-                        <div class="cimne-project-detail__pi-photo-wrap">
-                            <img class="cimne-project-detail__pi-photo" src="<?php echo esc_url( $pi['photo_url'] ); ?>" alt="<?php echo esc_attr( $pi['name'] ); ?>">
-                        </div>
-                    <?php endif; ?>
+                    <div class="cimne-project-detail__pi-photo-wrap">
+                        <img class="cimne-project-detail__pi-photo" src="<?php echo esc_url( $has_photo ? $pi['photo_url'] : '/wp-content/uploads/2024/12/Hidden_profile_pic.png' ); ?>" alt="<?php echo esc_attr( $pi['name'] ); ?>">
+                    </div>
 
                     <div class="cimne-project-detail__pi-text">
                         <span class="cimne-project-detail__pi-label"><?php echo esc_html__( 'Principal investigator', 'cimne' ); ?></span>

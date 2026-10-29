@@ -24,6 +24,7 @@
     flex-direction: row;
     -ms-flex-wrap: wrap;
     flex-wrap: wrap;
+    margin-bottom: 42px;
 }
 
 .cimne-directory-list .staff-item {

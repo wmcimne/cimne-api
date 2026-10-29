@@ -12,9 +12,19 @@
     margin: 0;
 }
 
+/* Leadersghip */
+dl.cluster-meta dt {
+    font-size: 17px;
+    font-weight: 700;
+}
+dl.cluster-meta dd {
+    margin: 0 0 8px;
+    font-size: 16px;
+}
+
 /* Staff */
-.cimne-research-staff__role + .cimne-research-staff__role {
-    margin-top: 24px;
+.cimne-research-staff__role {
+    margin-bottom: 42px;
 }
 
 .cimne-research-staff__role-title {

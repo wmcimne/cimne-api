@@ -10,6 +10,7 @@
     display: grid;
     gap: 18px;
     width: 100%;
+    margin-bottom: 42px;
 }
 
 .cimne-directory-filters__field {

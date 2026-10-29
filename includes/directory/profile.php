@@ -27,7 +27,7 @@ function cimne_directory_get_person_profile( $person_id ) {
         'persona',
         array( 'id' => $person_id ),
         array(
-            'cache_variant' => 'directory-person-profile-v4',
+            'cache_variant' => 'directory-person-profile-v5',
             'transform'     => 'cimne_normalize_directory_profile_payload',
         )
     );

@@ -22,25 +22,19 @@ if ( '' === $contact_point && empty( $academic_leaders ) && empty( $external_adv
     return;
 }
 ?>
-<div class="cimne-cluster-leadership" data-unit-code="<?php echo esc_attr( $unit_code ); ?>">
+<dl class="cluster-meta" data-unit-code="<?php echo esc_attr( $unit_code ); ?>">
     <?php if ( '' !== $contact_point ) : ?>
-        <section class="cimne-cluster-leadership__section cimne-cluster-leadership__section--contact">
-            <h3 class="cimne-cluster-leadership__title"><?php echo esc_html__( 'Contact Point', 'cimne' ); ?></h3>
-            <p class="cimne-cluster-leadership__people"><?php echo esc_html( $contact_point ); ?></p>
-        </section>
+        <dt><?php echo esc_html__( 'Contact Point', 'cimne' ); ?></dt>
+        <dd><?php echo esc_html( $contact_point ); ?></dd>
     <?php endif; ?>
 
     <?php if ( ! empty( $academic_leaders ) ) : ?>
-        <section class="cimne-cluster-leadership__section cimne-cluster-leadership__section--academic">
-            <h3 class="cimne-cluster-leadership__title"><?php echo esc_html__( 'Academic Leaders', 'cimne' ); ?></h3>
-            <p class="cimne-cluster-leadership__people"><?php echo esc_html( implode( ', ', $academic_leaders ) ); ?></p>
-        </section>
+        <dt><?php echo esc_html__( 'Academic Leaders', 'cimne' ); ?></dt>
+        <dd><?php echo esc_html( implode( ', ', $academic_leaders ) ); ?></dd>
     <?php endif; ?>
 
     <?php if ( ! empty( $external_advisors ) ) : ?>
-        <section class="cimne-cluster-leadership__section cimne-cluster-leadership__section--external">
-            <h3 class="cimne-cluster-leadership__title"><?php echo esc_html__( 'External Advisors', 'cimne' ); ?></h3>
-            <p class="cimne-cluster-leadership__people"><?php echo esc_html( implode( ', ', $external_advisors ) ); ?></p>
-        </section>
+        <dt><?php echo esc_html__( 'External Advisors', 'cimne' ); ?></dt>
+        <dd><?php echo esc_html( implode( ', ', $external_advisors ) ); ?></dd>
     <?php endif; ?>
-</div>
+</dl>
