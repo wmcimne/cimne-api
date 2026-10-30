@@ -18,7 +18,6 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 function cimne_sheets_get_sources() {
     $phd_spreadsheet_id   = '1au3CsOYkxS2yLhYX-YTsc7XCGNzCBxsvGO5xO1tyxuM';
-    $cenit_spreadsheet_id = '1sSgLMlmaWTPSyaVZxSh2OETP--O9NevswQgc1RwWxyQ';
 
     $sources = array(
         'phd-theses' => array(
@@ -37,29 +36,6 @@ function cimne_sheets_get_sources() {
             'spreadsheet_id' => '1dElHzsKJ-0FD6ut_2oxKJOYLcUca3lWQ63--H2mlCxM',
             'sheet_name'     => 'oko-card',
             'range'          => 'A2:E',
-        ),
-
-        /*
-         * CENIT contracts.
-         *
-         * One spreadsheet contains three tabs. Each tab is registered as an
-         * independent source so its cache key and Google Sheets request remain
-         * completely isolated from the other CENIT areas.
-         */
-        'cenit-urban-mobility' => array(
-            'spreadsheet_id' => $cenit_spreadsheet_id,
-            'sheet_name'     => 'urban-mobility',
-            'range'          => 'A2:I',
-        ),
-        'cenit-logistics-and-maritime-transport' => array(
-            'spreadsheet_id' => $cenit_spreadsheet_id,
-            'sheet_name'     => 'logistics-and-maritime-transport',
-            'range'          => 'A2:I',
-        ),
-        'cenit-infrastructure-management' => array(
-            'spreadsheet_id' => $cenit_spreadsheet_id,
-            'sheet_name'     => 'infrastructure-management',
-            'range'          => 'A2:I',
         ),
     );
 
@@ -123,6 +99,15 @@ add_filter( 'cimne_sheets_sources', 'cimne_sheets_append_runtime_sources', 20 );
  */
 function cimne_sheets_get_beegroup_spreadsheet_id() {
     return '10pMxXzD0-c_uuiIy788Tbm49imFE4x5YatJi_gYdjO4';
+}
+
+/**
+ * Returns the CENIT contracts spreadsheet ID.
+ *
+ * @return string
+ */
+function cimne_sheets_get_cenit_spreadsheet_id() {
+    return '1sSgLMlmaWTPSyaVZxSh2OETP--O9NevswQgc1RwWxyQ';
 }
 
 /**

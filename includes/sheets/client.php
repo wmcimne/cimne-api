@@ -43,7 +43,8 @@ function cimne_sheets_log( $message, array $context = array() ) {
  * @return string
  */
 function cimne_sheets_build_values_url( array $source, $api_key ) {
-    $sheet_range = $source['sheet_name'] . '!' . $source['range'];
+    $sheet_name  = str_replace( "'", "''", $source['sheet_name'] );
+    $sheet_range = "'" . $sheet_name . "'!" . $source['range'];
     $base_url    = sprintf(
         'https://sheets.googleapis.com/v4/spreadsheets/%s/values/%s',
         rawurlencode( $source['spreadsheet_id'] ),

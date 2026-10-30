@@ -3,8 +3,8 @@
  * Contract/project listings sourced from Google Sheets.
  *
  * This module contains the shared data model used by the Innovation Unit
- * contract lists. CENIT uses one spreadsheet with three tabs; the shortcode
- * selects the corresponding source explicitly through its area attribute.
+ * contract lists. Each shortcode selects a tab by its name in the area
+ * attribute.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -166,33 +166,59 @@ function cimne_sheets_render_contracts( array $contracts ) {
 }
 
 /**
- * Maps a public CENIT area slug to the internal Google Sheets source.
+ * Returns the request-local source for a contract tab.
  *
- * Keeping this allowlist explicit prevents arbitrary sheet names from being
- * requested through shortcode attributes.
+ * The tab name is supplied by the shortcode's area attribute. Tab names are
+ * validated before being registered as a runtime source.
  *
- * @param string $area CENIT area slug.
- * @return string
+ * @param string $area           Google Sheets tab name.
+ * @param string $source_prefix  Prefix for the internal source code.
+ * @param string $spreadsheet_id Google spreadsheet ID.
+ * @return string Empty string when invalid.
  */
-function cimne_sheets_get_cenit_source_for_area( $area ) {
-    $area = sanitize_key( (string) $area );
+function cimne_sheets_get_contract_source_for_area( $area, $source_prefix, $spreadsheet_id ) {
+    $area = trim( sanitize_text_field( (string) $area ) );
 
-    $sources = array(
-        'urban-mobility'                    => 'cenit-urban-mobility',
-        'logistics-and-maritime-transport' => 'cenit-logistics-and-maritime-transport',
-        'infrastructure-management'        => 'cenit-infrastructure-management',
+    if ( '' === $area || strlen( $area ) > 120 || '' === $spreadsheet_id ) {
+        return '';
+    }
+
+    if ( preg_match( '/[\x00-\x1F\x7F]/', $area ) ) {
+        return '';
+    }
+
+    $source_code = $source_prefix . '-' . substr( md5( $area ), 0, 16 );
+
+    $registered = cimne_sheets_register_runtime_source(
+        $source_code,
+        array(
+            'spreadsheet_id' => $spreadsheet_id,
+            'sheet_name'     => $area,
+            'range'          => 'A2:I',
+        )
     );
 
-    return isset( $sources[ $area ] ) ? $sources[ $area ] : '';
+    return $registered ? $source_code : '';
+}
+
+/**
+ * Returns the request-local source for one CENIT tab.
+ *
+ * @param string $area Google Sheets tab name.
+ * @return string Empty string when invalid.
+ */
+function cimne_sheets_get_cenit_source_for_area( $area ) {
+    return cimne_sheets_get_contract_source_for_area(
+        $area,
+        'cenit',
+        cimne_sheets_get_cenit_spreadsheet_id()
+    );
 }
 
 /**
  * Shortcode: [cimne_cenit_contracts area="..."]
  *
- * Supported values:
- * - urban-mobility
- * - logistics-and-maritime-transport
- * - infrastructure-management
+ * The area must exactly match a tab name in the CENIT spreadsheet.
  *
  * The surrounding Divi module may keep the existing CSS ID
  * "contracts-container". The shortcode does not render a duplicate ID.
@@ -213,7 +239,7 @@ function cimne_cenit_contracts_shortcode( $atts = array() ) {
         'cimne_cenit_contracts'
     );
 
-    $area        = sanitize_key( (string) $atts['area'] );
+    $area        = trim( sanitize_text_field( (string) $atts['area'] ) );
     $source_code = cimne_sheets_get_cenit_source_for_area( $area );
 
     if ( '' === $source_code ) {
@@ -247,7 +273,7 @@ function cimne_cenit_contracts_shortcode( $atts = array() ) {
 add_shortcode( 'cimne_cenit_contracts', 'cimne_cenit_contracts_shortcode' );
 
 /**
- * Registers and returns the request-local source for one BEEGroup tab.
+ * Returns the request-local source for one BEEGroup tab.
  *
  * The legacy integration already stores the exact Google Sheets tab in the
  * Divi marker's rl-code attribute. Instead of hard-coding a second allowlist,
@@ -257,35 +283,17 @@ add_shortcode( 'cimne_cenit_contracts', 'cimne_cenit_contracts_shortcode' );
  * @return string Empty string when invalid.
  */
 function cimne_sheets_get_beegroup_source_for_area( $area ) {
-    $area = trim( sanitize_text_field( (string) $area ) );
-
-    if ( '' === $area || strlen( $area ) > 120 ) {
-        return '';
-    }
-
-    // Do not allow A1 range separators or control characters in a tab name.
-    if ( false !== strpos( $area, '!' ) || preg_match( '/[\x00-\x1F\x7F]/', $area ) ) {
-        return '';
-    }
-
-    $source_code = 'beegroup-' . substr( md5( $area ), 0, 16 );
-
-    $registered = cimne_sheets_register_runtime_source(
-        $source_code,
-        array(
-            'spreadsheet_id' => cimne_sheets_get_beegroup_spreadsheet_id(),
-            'sheet_name'     => $area,
-            'range'          => 'A2:I',
-        )
+    return cimne_sheets_get_contract_source_for_area(
+        $area,
+        'beegroup',
+        cimne_sheets_get_beegroup_spreadsheet_id()
     );
-
-    return $registered ? $source_code : '';
 }
 
 /**
  * Shortcode: [cimne_beegroup_contracts area="..."]
  *
- * The area value must match the configured contract area code exactly.
+ * The area value must match the Google Sheets tab name exactly.
  * This keeps BEEGroup pages independent from WordPress page slugs and WPML
  * translations.
  *
@@ -340,4 +348,3 @@ function cimne_beegroup_contracts_shortcode( $atts = array() ) {
     return cimne_sheets_render_contracts( $contracts );
 }
 add_shortcode( 'cimne_beegroup_contracts', 'cimne_beegroup_contracts_shortcode' );
-
