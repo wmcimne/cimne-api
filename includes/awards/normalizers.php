@@ -46,8 +46,11 @@ function cimne_fellowship_person_name( array $person ) {
 /**
  * Extracts unique beneficiaries from a fellowship.
  *
+ * The optional photo_url field is reserved so the detail template can use it
+ * as soon as /becas starts returning it. Until then its value is null.
+ *
  * @param array $people Raw personal array.
- * @return array<int,array{id:int|string|null,name:string}>
+ * @return array<int,array{id:int|string|null,name:string,photo_url:string|null}>
  */
 function cimne_fellowship_extract_beneficiaries( array $people ) {
     $beneficiaries = array();
@@ -58,8 +61,9 @@ function cimne_fellowship_extract_beneficiaries( array $people ) {
             continue;
         }
 
-        $id   = cimne_api_value( $person, array( 'idtercero' ) );
-        $name = cimne_fellowship_person_name( $person );
+        $id        = cimne_api_value( $person, array( 'idtercero' ) );
+        $name      = cimne_fellowship_person_name( $person );
+        $photo_url = trim( (string) cimne_api_value( $person, array( 'photo_url' ), '' ) );
 
         if ( '' === $name ) {
             continue;
@@ -75,8 +79,9 @@ function cimne_fellowship_extract_beneficiaries( array $people ) {
 
         $seen[ $key ] = true;
         $beneficiaries[] = array(
-            'id'   => is_numeric( $id ) ? (int) $id : $id,
-            'name' => $name,
+            'id'        => is_numeric( $id ) ? (int) $id : $id,
+            'name'      => $name,
+            'photo_url' => '' !== $photo_url ? $photo_url : null,
         );
     }
 

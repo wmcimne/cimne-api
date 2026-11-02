@@ -1340,12 +1340,12 @@ p.staff-name {
   color: #004996;
   font-weight: 700;
 }
-.iu-projects.cenit-projects .description-list .title {
+/* .iu-projects.cenit-projects .description-list .title {
   color: #F3921A;
 }
 .iu-projects .description-list .title {
   color: #0f9d58;
-}
+} */
 
 
 .list-website a,
@@ -1445,14 +1445,14 @@ span.list-website {
   padding: 20px;
 
 }
-.iu-projects.cenit-projects [class*="project-ficha"] {
+/* .iu-projects.cenit-projects [class*="project-ficha"] {
   background: rgba(243,146,26,0.2);
   padding: 20px;
-}
-.iu-projects [class*="project-ficha"] {
+} */
+/* .iu-projects [class*="project-ficha"] {
   background: rgba(35, 229, 89, 0.15);
   padding: 20px;
-}
+} */
 
 /* new styles 2 */
 .project-ficha-back {
@@ -1983,95 +1983,11 @@ p.no-results {
 ----------------------------------------------------------------*/
 
 
-/* Newsletter form */
-.inline-form {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -ms-flex-wrap: wrap;
-      flex-wrap: wrap;
-  gap: 1rem;
-  -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
-}
-.form-field {
-  
-  display: -webkit-box;
-  
-  display: -ms-flexbox;
-  
-  display: flex;
-  -webkit-box-pack: justify;
-      -ms-flex-pack: justify;
-          justify-content: space-between;
-  padding: 20px 0 20px 0;
-}
-.form-field input {
-  padding-left: 5px;
-  height: 37px;
-  line-height: 18px;
-  border: 0;
-  outline: none;
-}
-/* .bee-group-form .form-field input {
-  color: #23e559;
-}
-.cenit-group-form .form-field input {
-  color: #f3921a;
-} */
+/* Se eliminaron los estilos formularios en BeeGroup y Cenit Newsletter form.
+Si se retoman buscar los estilos en git o crear un nuevo archivo de estilos */
 
-.form-field input:not(:first-child) {
-  margin-left: 5px;
-}
-.bee-group-form .form-field input::-webkit-input-placeholder {
-  color: #0f9d58;
-}
-.bee-group-form .form-field input::-moz-placeholder {
-  color: #0f9d58;
-}
-.bee-group-form .form-field input:-ms-input-placeholder {
-  color: #0f9d58;
-}
-.bee-group-form .form-field input::-ms-input-placeholder {
-  color: #0f9d58;
-}
-.bee-group-form .form-field input::placeholder {
-  color: #0f9d58;
-}
-.cenit-group-form .form-field input::-webkit-input-placeholder {
-  color: #F3921A;
-}
-.cenit-group-form .form-field input::-moz-placeholder {
-  color: #F3921A;
-}
-.cenit-group-form .form-field input:-ms-input-placeholder {
-  color: #F3921A;
-}
-.cenit-group-form .form-field input::-ms-input-placeholder {
-  color: #F3921A;
-}
-.form-field input::placeholder {
-  color: #F3921A;
-}
-.inline-form p {
-  margin: 0;
-  -webkit-box-flex: 1;
-      -ms-flex: 1;
-          flex: 1;
-}
-.inline-form button {
-  -webkit-box-flex: 0;
-      -ms-flex: 0 0 auto;
-          flex: 0 0 auto;
-}
-.form-container {
-  display: -ms-grid;
-  display: grid;
-  -ms-grid-columns: 2fr 1fr;
-  grid-template-columns: 2fr 1fr;
-  
-}
+
+
 .cimne-projects-filters__actions [class^="text-flecha"],
 .clickable-cta [class^="text-flecha"],
 .form-container [class^="text-flecha"]  {
@@ -2080,24 +1996,6 @@ p.no-results {
   font-size: 18px;
   text-transform: uppercase;
 }
-
-
-@media (max-width: 768px) {
-  .form-field {
-    -webkit-box-orient: vertical;
-    -webkit-box-direction: normal;
-        -ms-flex-direction: column;
-            flex-direction: column;
-    -webkit-box-align: start;
-        -ms-flex-align: start;
-            align-items: flex-start;
-  }
-  .form-field input {
-    margin-left: 0 !important;
-    margin-bottom: 10px;
-  }
-}
-
 
 /*--------------------------------------------------------------
     COMMUNITY

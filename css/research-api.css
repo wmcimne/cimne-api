@@ -6,6 +6,11 @@
     --cimne-research-panel: #dff3f4;
     --cimne-research-panel-strong: #d5eff0;
     --cimne-research-text: #202020;
+    --cimne-research-orange: #f3921a;
+    --cimne-research-orange-soft: rgba(243, 146, 26, 0.2);/*rgba(243, 146, 26, 0.2);*/
+    --cimne-research-green: #0f9d58;
+    --cimne-research-green-soft: rgba(35, 229, 89, 0.15);/*rgba(35, 229, 89, 0.15);*/
+    
 }
 
 .cimne-research-empty {
@@ -191,6 +196,22 @@ dl.cluster-meta dd {
     background: var(--cimne-research-panel);
 }
 
+.cenit-projects-list .cimne-project-detail__toolbar,
+.cenit-projects-list .cimne-project-detail__header,
+.cenit-projects-list .cimne-project-detail__funding,
+.cenit-projects-list .cimne-project-detail__main,
+.cenit-projects-list .cimne-project-detail__footer {
+    background: var(--cimne-research-orange-soft);
+}
+
+.bee-group-projects-list .cimne-project-detail__toolbar,
+.bee-group-projects-list .cimne-project-detail__header,
+.bee-group-projects-list .cimne-project-detail__funding,
+.bee-group-projects-list .cimne-project-detail__main,
+.bee-group-projects-list .cimne-project-detail__footer {
+    background: var(--cimne-research-green-soft);
+}
+
 .cimne-project-detail__toolbar {
     display: flex;
     justify-content: space-between;
@@ -224,6 +245,7 @@ dl.cluster-meta dd {
     margin: 0 0 6px;
     color: var(--cimne-research-teal);
     font-size: 23px;
+    font-weight: 700;
 }
 
 .cimne-project-detail__title {
@@ -277,7 +299,12 @@ dl.cluster-meta dd {
     border: 1px solid var(--cimne-research-teal);
     border-radius: 50%;
 }
-
+.cenit-projects-list .cimne-project-detail__pi-photo-wrap {
+    border-color: var(--cimne-research-orange);
+}
+.bee-group-projects-list .cimne-project-detail__pi-photo-wrap {
+    border-color: var(--cimne-research-green);
+}
 .cimne-project-detail__pi-photo {
     width: 100%;
     height: 100%;
@@ -290,9 +317,11 @@ dl.cluster-meta dd {
 }
 
 .cimne-project-detail__pi-label {
-    font-family: Georgia, 'Times New Roman', serif;
+    font-family: 'Lora', Times, serif;
     font-size: 16px;
     font-style: italic;
+    font-weight: 700;
+    
 }
 
 .cimne-project-detail__pi-name {
@@ -374,9 +403,25 @@ dl.cluster-meta dd {
   color: #F3921A !important;
 }
 .cenit-projects-list .cimne-project-list__body .cimne-project-list__acronym,
-.cenit-projects-list .cimne-project-list__body .cimne-project-list__title {
+.cenit-projects-list .cimne-project-list__body .cimne-project-list__title,
+.cenit-projects-list .cimne-project-detail__title,
+.cenit-projects-list .cimne-project-detail__acronym {
   color: #004996 !important;
+  font-weight: 700;
 }
+
+/* Beegroup Projects List colors*/
+.bee-group-projects-list .cimne-project-list .cimne-project-list__category {
+    color: var(--cimne-research-green) !important;
+}
+.bee-group-projects-list .cimne-project-list__body .cimne-project-list__acronym,
+.bee-group-projects-list .cimne-project-list__body .cimne-project-list__title,
+.bee-group-projects-list .cimne-project-detail__title,
+.bee-group-projects-list .cimne-project-detail__acronym {
+   color: var(--cimne-research-blue) !important;
+   font-weight: 700;
+}
+
 .description-list .list-title span:first-child {
   -webkit-text-decoration: capitalize;
           text-decoration: capitalize;

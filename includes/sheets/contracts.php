@@ -194,7 +194,7 @@ function cimne_sheets_get_contract_source_for_area( $area, $source_prefix, $spre
         array(
             'spreadsheet_id' => $spreadsheet_id,
             'sheet_name'     => $area,
-            'range'          => 'A2:I',
+            'range'          => 'A2:I10',
         )
     );
 

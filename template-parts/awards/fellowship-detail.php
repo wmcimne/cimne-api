@@ -7,12 +7,12 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-$fellowship = isset( $args['fellowship'] ) && is_array( $args['fellowship'] ) ? $args['fellowship'] : array();
-$code        = isset( $fellowship['code'] ) ? trim( (string) $fellowship['code'] ) : '';
-$acronym     = isset( $fellowship['acronym'] ) ? trim( (string) $fellowship['acronym'] ) : '';
-$title       = isset( $fellowship['title'] ) ? trim( (string) $fellowship['title'] ) : '';
-$abstract    = isset( $fellowship['abstract'] ) ? trim( (string) $fellowship['abstract'] ) : '';
-$funders     = isset( $fellowship['funding_bodies'] ) && is_array( $fellowship['funding_bodies'] ) ? $fellowship['funding_bodies'] : array();
+$fellowship    = isset( $args['fellowship'] ) && is_array( $args['fellowship'] ) ? $args['fellowship'] : array();
+$code          = isset( $fellowship['code'] ) ? trim( (string) $fellowship['code'] ) : '';
+$acronym       = isset( $fellowship['acronym'] ) ? trim( (string) $fellowship['acronym'] ) : '';
+$title         = isset( $fellowship['title'] ) ? trim( (string) $fellowship['title'] ) : '';
+$abstract      = isset( $fellowship['abstract'] ) ? trim( (string) $fellowship['abstract'] ) : '';
+$funders       = isset( $fellowship['funding_bodies'] ) && is_array( $fellowship['funding_bodies'] ) ? $fellowship['funding_bodies'] : array();
 $beneficiaries = isset( $fellowship['beneficiaries'] ) && is_array( $fellowship['beneficiaries'] ) ? $fellowship['beneficiaries'] : array();
 
 $more_information = array(
@@ -63,11 +63,35 @@ $more_information = array_filter(
         <div class="cimne-fellowship-detail__summary">
             <?php if ( ! empty( $beneficiaries ) ) : ?>
                 <div class="cimne-fellowship-detail__beneficiaries">
-                    <span class="cimne-fellowship-detail__beneficiary-label"><?php echo esc_html( _n( 'Beneficiary', 'Beneficiaries', count( $beneficiaries ), 'cimne' ) ); ?></span>
                     <?php foreach ( $beneficiaries as $beneficiary ) : ?>
-                        <?php if ( ! empty( $beneficiary['name'] ) ) : ?>
-                            <span class="cimne-fellowship-detail__beneficiary-name"><?php echo esc_html( $beneficiary['name'] ); ?></span>
-                        <?php endif; ?>
+                        <?php
+                        if ( ! is_array( $beneficiary ) ) {
+                            continue;
+                        }
+
+                        $beneficiary_name  = isset( $beneficiary['name'] ) ? trim( (string) $beneficiary['name'] ) : '';
+                        $beneficiary_photo = isset( $beneficiary['photo_url'] ) ? trim( (string) $beneficiary['photo_url'] ) : '';
+                        $has_photo         = '' !== $beneficiary_photo;
+
+                        if ( '' === $beneficiary_name ) {
+                            continue;
+                        }
+                        ?>
+
+                        <div class="cimne-fellowship-detail__beneficiary <?php echo $has_photo ? 'cimne-fellowship-detail__beneficiary--has-photo' : 'cimne-fellowship-detail__beneficiary--no-photo'; ?>">
+                            <div class="cimne-fellowship-detail__beneficiary-photo-wrap">
+                                <img
+                                    class="cimne-fellowship-detail__beneficiary-photo"
+                                    src="<?php echo esc_url( $has_photo ? $beneficiary_photo : '/wp-content/uploads/2024/12/Hidden_profile_pic.png' ); ?>"
+                                    alt="<?php echo esc_attr( $beneficiary_name ); ?>"
+                                >
+                            </div>
+
+                            <div class="cimne-fellowship-detail__beneficiary-text">
+                                <span class="cimne-fellowship-detail__beneficiary-label"><?php echo esc_html__( 'Beneficiary', 'cimne' ); ?></span>
+                                <span class="cimne-fellowship-detail__beneficiary-name"><?php echo esc_html( $beneficiary_name ); ?></span>
+                            </div>
+                        </div>
                     <?php endforeach; ?>
                 </div>
             <?php endif; ?>
