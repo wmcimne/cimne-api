@@ -1,6 +1,10 @@
 <?php
 /**
- * Fellowships filters.
+ * Fellowships filters powered by opts_becas.
+ *
+ * The complete A/C/F fellowship collection is still preloaded for client-side
+ * filtering and detail navigation, but Category and Beneficiary option values
+ * come from opts_becas, which is the authoritative filter catalogue.
  *
  * Shortcode: [cimne_fellowships_filters]
  */
@@ -12,8 +16,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Gets cached options required by the Awards / Fellowships filter.
  *
- * Category and Beneficiary options come from /opts_becas.
- * Search remains a browser-side free-text filter.
+ * Category and Beneficiary options come from /opts_becas. Search remains a
+ * browser-side free-text filter over the preloaded fellowship collection.
  *
  * @return array
  */
@@ -27,7 +31,7 @@ function cimne_fellowships_get_filter_options() {
         'opts_becas',
         array(),
         array(
-            'cache_variant' => 'fellowship-filter-options-v2',
+            'cache_variant' => 'fellowship-filter-options-v3',
             'transform'     => 'cimne_normalize_fellowship_filter_options_payload',
         )
     );
@@ -37,12 +41,14 @@ function cimne_fellowships_get_filter_options() {
             'Fellowship filter options unavailable.',
             array( 'error_code' => $options->get_error_code() )
         );
+
         return $base;
     }
 
     $base['nature'] = isset( $options['nature'] ) && is_array( $options['nature'] )
         ? $options['nature']
         : array();
+
     $base['beneficiaries'] = isset( $options['beneficiaries'] ) && is_array( $options['beneficiaries'] )
         ? $options['beneficiaries']
         : array();

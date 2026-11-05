@@ -10,6 +10,24 @@ if ( ! defined( 'ABSPATH' ) ) {
 $options       = isset( $args['options'] ) && is_array( $args['options'] ) ? $args['options'] : array();
 $nature        = isset( $options['nature'] ) && is_array( $options['nature'] ) ? $options['nature'] : array();
 $beneficiaries = isset( $options['beneficiaries'] ) && is_array( $options['beneficiaries'] ) ? $options['beneficiaries'] : array();
+
+/**
+ * Sort options alphabetically by label, ignoring accents and case.
+    * @param array $left  Left option.
+    * @param array $right Right option.
+    * @return int
+    */
+
+$sort_options = static function ( $left, $right ) {
+    $left_label  = isset( $left['label'] ) ? (string) $left['label'] : '';
+    $right_label = isset( $right['label'] ) ? (string) $right['label'] : '';
+
+    return strcasecmp( remove_accents( $left_label ), remove_accents( $right_label ) );
+};
+
+// usort( $nature, $sort_options );
+usort( $beneficiaries, $sort_options );
+
 ?>
 <form class="cimne-fellowships-filters" data-cimne-fellowship-filters>
     <div class="form-group cimne-fellowships-filters__field cimne-fellowships-filters__field--search">

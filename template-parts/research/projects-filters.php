@@ -20,7 +20,27 @@ $options       = isset( $args['options'] ) && is_array( $args['options'] ) ? $ar
 $nature        = isset( $options['nature'] ) && is_array( $options['nature'] ) ? $options['nature'] : array();
 $units         = isset( $options['units'] ) && is_array( $options['units'] ) ? $options['units'] : array();
 $investigators = isset( $options['investigators'] ) && is_array( $options['investigators'] ) ? $options['investigators'] : array();
+
+/**
+ * Sort options alphabetically by label, ignoring accents and case.
+ *
+ * @param array $left  Left option.
+ * @param array $right Right option.
+ *
+ * @return int
+ */
+$sort_options = static function ( $left, $right ) {
+    $left_label  = isset( $left['label'] ) ? (string) $left['label'] : '';
+    $right_label = isset( $right['label'] ) ? (string) $right['label'] : '';
+
+    return strcasecmp( remove_accents( $left_label ), remove_accents( $right_label ) );
+};
+
+// usort( $nature, $sort_options );
+usort( $units, $sort_options );
+usort( $investigators, $sort_options );
 ?>
+
 <form class="cimne-projects-filters" data-cimne-project-filters>
     <div class="form-group cimne-projects-filters__field cimne-projects-filters__field--search">
 

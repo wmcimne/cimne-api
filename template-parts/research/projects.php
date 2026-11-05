@@ -1,8 +1,8 @@
 <?php
 /**
  * Main interactive Projects shell shared by:
- * - Cluster / Research Group pages.
- * - The global Projects page.
+ * - Cluster / Research Group pages (REST-assisted, unchanged).
+ * - The global Projects page (A/C/F preloaded, browser-only interactions).
  *
  * Ongoing / Finished controls are rendered by Divi outside this template.
  * This template only owns the dynamic projects content area.
@@ -13,19 +13,25 @@
  * - projects_page_url
  * - project_card_url
  * - ongoing_html
+ * - finished_html (global only)
+ * - detail_html   (global only, [code => rendered HTML])
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-$project_context = isset( $args['project_context'] ) && 'global' === $args['project_context'] ? 'global' : 'research';
-$unit_code       = isset( $args['research_unit_code'] ) ? (string) $args['research_unit_code'] : '';
-$ongoing           = isset( $args['ongoing_html'] ) ? (string) $args['ongoing_html'] : '';
+$project_context  = isset( $args['project_context'] ) && 'global' === $args['project_context'] ? 'global' : 'research';
+$unit_code        = isset( $args['research_unit_code'] ) ? (string) $args['research_unit_code'] : '';
+$ongoing          = isset( $args['ongoing_html'] ) ? (string) $args['ongoing_html'] : '';
+$finished         = isset( $args['finished_html'] ) ? (string) $args['finished_html'] : '';
+$details          = isset( $args['detail_html'] ) && is_array( $args['detail_html'] ) ? $args['detail_html'] : array();
 $projects_page_url = isset( $args['projects_page_url'] ) ? (string) $args['projects_page_url'] : '';
 $project_card_url  = isset( $args['project_card_url'] ) ? (string) $args['project_card_url'] : '';
-$list_url          = rest_url( 'cimne/v1/research-projects/list' );
-$detail_url      = rest_url( 'cimne/v1/research-projects/detail' );
+$list_url           = rest_url( 'cimne/v1/research-projects/list' );
+$detail_url         = rest_url( 'cimne/v1/research-projects/detail' );
+
+$json_flags = JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT;
 ?>
 <div
     class="cimne-research-projects"
@@ -44,4 +50,19 @@ $detail_url      = rest_url( 'cimne/v1/research-projects/detail' );
             <?php echo $ongoing; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Rendered by trusted theme template. ?>
         </div>
     </div>
+
+    <?php if ( 'global' === $project_context ) : ?>
+        <script type="application/json" data-project-preloaded-lists><?php
+            echo wp_json_encode(
+                array(
+                    'ongoing'  => $ongoing,
+                    'finished' => $finished,
+                ),
+                $json_flags
+            ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- JSON encoded by WordPress.
+        ?></script>
+        <script type="application/json" data-project-preloaded-details><?php
+            echo wp_json_encode( $details, $json_flags ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- JSON encoded by WordPress.
+        ?></script>
+    <?php endif; ?>
 </div>

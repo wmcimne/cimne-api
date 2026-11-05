@@ -18,8 +18,11 @@ $funders     = isset( $project['funding_bodies'] ) && is_array( $project['fundin
 $program     = isset( $project['program'] ) ? trim( (string) $project['program'] ) : '';
 $website_url = isset( $project['website_url'] ) ? trim( (string) $project['website_url'] ) : '';
 $pi_ids      = isset( $project['principal_investigator_ids'] ) && is_array( $project['principal_investigator_ids'] ) ? $project['principal_investigator_ids'] : array();
+$category    = isset( $project['category'] ) ? trim( (string) $project['category'] ) : '';
+$unit_codes  = isset( $project['unit_codes'] ) && is_array( $project['unit_codes'] ) ? $project['unit_codes'] : array();
 $search_text = trim( $acronym . ' ' . $title );
 $pi_ids_attr = implode( ',', array_map( 'strval', $pi_ids ) );
+$unit_codes_attr = implode( ',', array_map( 'strval', $unit_codes ) );
 
 if ( '' === $code ) {
     return;
@@ -28,6 +31,8 @@ if ( '' === $code ) {
 <article
     class="cimne-project-list__item"
     data-project-search="<?php echo esc_attr( $search_text ); ?>"
+    data-project-category="<?php echo esc_attr( $category ); ?>"
+    data-project-unit-codes="<?php echo esc_attr( $unit_codes_attr ); ?>"
     data-project-pi-ids="<?php echo esc_attr( $pi_ids_attr ); ?>"
 >
     <div class="cimne-project-list__body">

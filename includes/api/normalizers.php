@@ -184,6 +184,64 @@ function cimne_project_extract_principal_investigator( array $people ) {
  * @param array $people Raw project-person array.
  * @return array<int|string>
  */
+/**
+ * Returns all Principal Investigators attached to one project.
+ *
+ * The collection is used by the global Projects filter so PI options can be
+ * derived from the same A/C/F payload that renders the lists.
+ *
+ * @param array $people Raw project-person array.
+ * @return array<int,array{id:int|string,name:string}>
+ */
+function cimne_project_principal_investigators( array $people ) {
+    $investigators = array();
+    $seen          = array();
+
+    foreach ( $people as $person ) {
+        if ( ! is_array( $person ) || ! cimne_project_person_is_principal_investigator( $person ) ) {
+            continue;
+        }
+
+        $id = cimne_api_value( $person, array( 'idtercero' ) );
+
+        if ( null === $id || '' === trim( (string) $id ) ) {
+            continue;
+        }
+
+        $name = trim(
+            implode(
+                ' ',
+                array_filter(
+                    array(
+                        trim( (string) cimne_api_value( $person, array( 'nombre' ), '' ) ),
+                        trim( (string) cimne_api_value( $person, array( 'apellido1' ), '' ) ),
+                        trim( (string) cimne_api_value( $person, array( 'apellido2' ), '' ) ),
+                    )
+                )
+            )
+        );
+
+        if ( '' === $name ) {
+            continue;
+        }
+
+        $normalized_id = is_numeric( $id ) ? (int) $id : trim( (string) $id );
+        $key           = (string) $normalized_id;
+
+        if ( isset( $seen[ $key ] ) ) {
+            continue;
+        }
+
+        $seen[ $key ] = true;
+        $investigators[] = array(
+            'id'   => $normalized_id,
+            'name' => $name,
+        );
+    }
+
+    return $investigators;
+}
+
 function cimne_project_principal_investigator_ids( array $people ) {
     $ids = array();
 
@@ -228,8 +286,11 @@ function cimne_normalize_project_list_item( array $project ) {
         'start_date'                 => cimne_api_value( $project, array( 'fecha_comienzo' ) ),
         'end_date'                   => cimne_api_value( $project, array( 'fecha_fin' ) ),
         'category'                   => trim( (string) cimne_api_value( $project, array( 'naturaleza_proyecto_descripcion' ), '' ) ),
+        'status_code'                => strtoupper( trim( (string) cimne_api_value( $project, array( 'estado_actual_codigo' ), '' ) ) ),
+        'department_code'            => trim( (string) cimne_api_value( $project, array( 'departamento_codigo' ), '' ) ),
         'funding_bodies'             => cimne_project_stakeholder_names_by_type( $stakeholders, 'FIN' ),
         'principal_investigator_ids' => cimne_project_principal_investigator_ids( $people ),
+        'principal_investigators'    => cimne_project_principal_investigators( $people ),
         // Pending WS fields already present in the design.
         'program'                    => null,
         'website_url'                => null,
@@ -304,6 +365,44 @@ function cimne_normalize_project_detail_item( array $project ) {
  */
 function cimne_normalize_project_detail_payload( array $projects, $resource = '', array $params = array() ) {
     return array_map( 'cimne_normalize_project_detail_item', $projects );
+}
+
+/**
+ * Reduces the complete A/C/F Projects payload used by the global Projects page.
+ *
+ * Each API item is normalized once into both its list representation and its
+ * detail representation. This lets PHP cache one compact collection while the
+ * browser performs status changes, filtering and detail navigation without
+ * additional REST/API requests.
+ *
+ * @param array  $projects Raw Projects API response.
+ * @param string $resource Resource name.
+ * @param array  $params   Query params.
+ * @return array
+ */
+function cimne_normalize_project_collection_payload( array $projects, $resource = '', array $params = array() ) {
+    $collection = array();
+
+    foreach ( $projects as $project ) {
+        if ( ! is_array( $project ) ) {
+            continue;
+        }
+
+        $list = cimne_normalize_project_list_item( $project );
+
+        if ( empty( $list['code'] ) ) {
+            continue;
+        }
+
+        $collection[] = array(
+            'status_code'     => isset( $list['status_code'] ) ? (string) $list['status_code'] : '',
+            'department_code' => isset( $list['department_code'] ) ? (string) $list['department_code'] : '',
+            'list'            => $list,
+            'detail'          => cimne_normalize_project_detail_item( $project ),
+        );
+    }
+
+    return $collection;
 }
 
 /**

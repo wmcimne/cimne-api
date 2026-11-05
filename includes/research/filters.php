@@ -2,6 +2,11 @@
 /**
  * Global Projects filters powered by opts_projects.
  *
+ * The complete A/C/F project collection is still preloaded for client-side
+ * filtering, but the filter option catalogue must come from opts_projects,
+ * which is the authoritative source for Category, Research Cluster / IU and
+ * Principal Investigator values.
+ *
  * Shortcode: [cimne_projects_filters]
  */
 
@@ -12,6 +17,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Gets reduced/cached filter options from opts_projects.
  *
+ * opts_projects remains independent from the A/C/F project collection used by
+ * the results component. This avoids deriving filter catalogues from project
+ * records whose option metadata is not guaranteed to be complete/reliable.
+ *
  * @return array|WP_Error
  */
 function cimne_projects_get_filter_options() {
@@ -19,7 +28,7 @@ function cimne_projects_get_filter_options() {
         'opts_projects',
         array(),
         array(
-            'cache_variant' => 'project-filter-options-v1',
+            'cache_variant' => 'project-filter-options-v2',
             'transform'     => 'cimne_normalize_project_filter_options_payload',
         )
     );

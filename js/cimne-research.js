@@ -111,6 +111,21 @@
         });
     }
 
+    function parseJsonScript(component, selector) {
+        var node = component.querySelector(selector);
+
+        if (!node) {
+            return {};
+        }
+
+        try {
+            var parsed = JSON.parse(node.textContent || '{}');
+            return parsed && typeof parsed === 'object' ? parsed : {};
+        } catch (error) {
+            return {};
+        }
+    }
+
     function getExternalProjectControls() {
         return {
             ongoing: document.querySelector(ONGOING_SELECTOR),
@@ -307,19 +322,28 @@
 
         var items = Array.prototype.slice.call(list.querySelectorAll('.cimne-project-list__item'));
         var searchNeedle = normalizeSearchText(filters.search);
+        var selectedCategory = filters.category;
+        var selectedUnit = filters.unit;
         var selectedPi = filters.pi;
         var visibleCount = 0;
 
         items.forEach(function (item) {
             var searchable = normalizeSearchText(item.getAttribute('data-project-search') || '');
+            var category = item.getAttribute('data-project-category') || '';
+            var unitCodes = (item.getAttribute('data-project-unit-codes') || '')
+                .split(',')
+                .map(function (value) { return value.trim(); })
+                .filter(Boolean);
             var piIds = (item.getAttribute('data-project-pi-ids') || '')
                 .split(',')
                 .map(function (value) { return value.trim(); })
                 .filter(Boolean);
 
             var matchesSearch = !searchNeedle || searchable.indexOf(searchNeedle) !== -1;
+            var matchesCategory = !selectedCategory || category === selectedCategory;
+            var matchesUnit = !selectedUnit || unitCodes.indexOf(selectedUnit) !== -1;
             var matchesPi = !selectedPi || piIds.indexOf(selectedPi) !== -1;
-            var visible = matchesSearch && matchesPi;
+            var visible = matchesSearch && matchesCategory && matchesUnit && matchesPi;
 
             /*
              * Do not rely on the HTML hidden attribute here. Project cards have
@@ -364,6 +388,12 @@
         var detailUrl = component.getAttribute('data-detail-url') || '';
         var projectsPageUrl = component.getAttribute('data-projects-page-url') || '';
         var projectCardUrl = component.getAttribute('data-project-card-url') || '';
+        var preloadedLists = context === 'global'
+            ? parseJsonScript(component, '[data-project-preloaded-lists]')
+            : {};
+        var preloadedDetails = context === 'global'
+            ? parseJsonScript(component, '[data-project-preloaded-details]')
+            : {};
         var content = component.querySelector('[data-project-content]');
         var notice = component.querySelector('[data-project-notice]');
         var controls = getExternalProjectControls();
@@ -376,7 +406,18 @@
         var activeStatus = initialStatus;
         var returnStatus = activeStatus;
 
-        if (!listUrl || !detailUrl || !projectsPageUrl || !content || (context === 'research' && !unit)) {
+        if (
+            !projectsPageUrl
+            || !content
+            || (context === 'research' && (!unit || !listUrl || !detailUrl))
+            || (
+                context === 'global'
+                && (
+                    !Object.prototype.hasOwnProperty.call(preloadedLists, 'ongoing')
+                    || !Object.prototype.hasOwnProperty.call(preloadedLists, 'finished')
+                )
+            )
+        ) {
             return;
         }
 
@@ -385,7 +426,14 @@
         }
 
         component.setAttribute('data-cimne-projects-initialized', '1');
-        listCache[serverListCacheKey('ongoing', emptyFilters())] = content.innerHTML;
+
+        if (context === 'global') {
+            listCache.ongoing = preloadedLists.ongoing || content.innerHTML;
+            listCache.finished = preloadedLists.finished || '';
+            detailCache = preloadedDetails;
+        } else {
+            listCache[serverListCacheKey('ongoing', emptyFilters())] = content.innerHTML;
+        }
 
         prepareExternalControl(controls.ongoing, translate('ongoingProjects', 'Ongoing projects'));
         prepareExternalControl(controls.finished, translate('finishedProjects', 'Finished projects'));
@@ -411,6 +459,10 @@
             status = status === 'finished' ? 'finished' : 'ongoing';
             filters = context === 'global' ? normalizeFilters(filters) : emptyFilters();
 
+            if (context === 'global') {
+                return Promise.resolve(listCache[status] || '');
+            }
+
             var cacheKey = serverListCacheKey(status, filters);
 
             if (Object.prototype.hasOwnProperty.call(listCache, cacheKey)) {
@@ -420,19 +472,11 @@
             setLoading(true);
             setNotice('');
 
-            var params = {
+            return requestJson(listUrl, {
                 context: context,
-                status: status
-            };
-
-            if (context === 'research') {
-                params.unit = unit;
-            } else {
-                params.category = filters.category;
-                params.filter_unit = filters.unit;
-            }
-
-            return requestJson(listUrl, params).then(function (data) {
+                status: status,
+                unit: unit
+            }).then(function (data) {
                 listCache[cacheKey] = data.html || '';
                 return listCache[cacheKey];
             }).finally(function () {
@@ -480,19 +524,18 @@
                 return Promise.resolve(detailCache[code]);
             }
 
+            if (context === 'global') {
+                return Promise.reject(new Error('Project detail is not present in the preloaded collection.'));
+            }
+
             setLoading(true);
             setNotice('');
 
-            var params = {
+            return requestJson(detailUrl, {
                 context: context,
-                project: code
-            };
-
-            if (context === 'research') {
-                params.unit = unit;
-            }
-
-            return requestJson(detailUrl, params).then(function (data) {
+                project: code,
+                unit: unit
+            }).then(function (data) {
                 detailCache[code] = data.html || '';
                 return detailCache[code];
             }).finally(function () {

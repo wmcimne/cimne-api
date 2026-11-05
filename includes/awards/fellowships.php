@@ -99,6 +99,38 @@ function cimne_fellowships_get_list( $status = 'ongoing', array $filters = array
  * @param string $code Bxxxxx code.
  * @return array|WP_Error
  */
+/**
+ * Gets the complete reduced A/C/F Fellowships collection.
+ *
+ * The result is cached as a single transformed payload containing both list
+ * and detail shapes. The Awards page can therefore handle status, filters and
+ * inline detail navigation without additional REST/API requests.
+ *
+ * @return array|WP_Error
+ */
+function cimne_fellowships_get_collection() {
+    static $loaded = false;
+    static $collection;
+
+    if ( $loaded ) {
+        return $collection;
+    }
+
+    $loaded = true;
+    $collection = cimne_api_get(
+        'fellowships',
+        array(
+            'estado_actual_codigo' => 'A,C,F',
+        ),
+        array(
+            'cache_variant' => 'fellowship-collection-v1',
+            'transform'     => 'cimne_normalize_fellowship_collection_payload',
+        )
+    );
+
+    return $collection;
+}
+
 function cimne_fellowships_get_detail( $code ) {
     $code = trim( sanitize_text_field( (string) $code ) );
 
@@ -184,19 +216,69 @@ function cimne_fellowships_render_detail( array $item ) {
 }
 
 /**
+ * Splits the complete collection into Ongoing/Finished list items and rendered
+ * detail HTML keyed by fellowship code.
+ *
+ * @param array $collection Reduced A/C/F collection.
+ * @return array
+ */
+function cimne_fellowships_prepare_collection( array $collection ) {
+    $ongoing  = array();
+    $finished = array();
+    $details  = array();
+
+    foreach ( $collection as $entry ) {
+        if ( ! is_array( $entry ) || empty( $entry['list'] ) || ! is_array( $entry['list'] ) ) {
+            continue;
+        }
+
+        $list = $entry['list'];
+        $code = isset( $list['code'] ) ? trim( (string) $list['code'] ) : '';
+
+        if ( '' === $code ) {
+            continue;
+        }
+
+        $status_code = isset( $entry['status_code'] )
+            ? strtoupper( trim( (string) $entry['status_code'] ) )
+            : '';
+
+        if ( 'A' === $status_code ) {
+            $ongoing[] = $list;
+        } elseif ( in_array( $status_code, array( 'C', 'F' ), true ) ) {
+            $finished[] = $list;
+        }
+
+        if ( ! empty( $entry['detail'] ) && is_array( $entry['detail'] ) ) {
+            $details[ $code ] = cimne_fellowships_render_detail( $entry['detail'] );
+        }
+    }
+
+    return array(
+        'ongoing'  => $ongoing,
+        'finished' => $finished,
+        'details'  => $details,
+    );
+}
+
+/**
  * Builds the initial SSR component context.
  *
  * @return array|WP_Error
  */
 function cimne_fellowships_get_context() {
-    $items = cimne_fellowships_get_list( 'ongoing' );
+    $collection = cimne_fellowships_get_collection();
 
-    if ( is_wp_error( $items ) ) {
-        return $items;
+    if ( is_wp_error( $collection ) ) {
+        return $collection;
     }
 
+    $prepared = cimne_fellowships_prepare_collection( $collection );
+
     return array(
-        'ongoing_html' => cimne_fellowships_render_list( $items, 'ongoing' ),
+        'ongoing_html'  => cimne_fellowships_render_list( $prepared['ongoing'], 'ongoing' ),
+        'finished_html' => cimne_fellowships_render_list( $prepared['finished'], 'finished' ),
+        'detail_html'   => $prepared['details'],
     );
 }
 

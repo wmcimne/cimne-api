@@ -9,31 +9,27 @@
 
     function normalizeText(value) {
         value = String(value || '').toLowerCase();
+
         if (value.normalize) {
             value = value.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
         }
+
         return value.trim();
     }
 
-    function requestJson(url, params) {
-        var target = new URL(url, window.location.origin);
-        Object.keys(params || {}).forEach(function (key) {
-            var value = params[key];
-            if (value !== undefined && value !== null && String(value) !== '') {
-                target.searchParams.set(key, String(value));
-            }
-        });
+    function parseJsonScript(component, selector) {
+        var node = component.querySelector(selector);
 
-        return fetch(target.toString(), {
-            method: 'GET',
-            credentials: 'same-origin',
-            headers: { 'Accept': 'application/json' }
-        }).then(function (response) {
-            if (!response.ok) {
-                throw new Error('HTTP ' + response.status);
-            }
-            return response.json();
-        });
+        if (!node) {
+            return {};
+        }
+
+        try {
+            var parsed = JSON.parse(node.textContent || '{}');
+            return parsed && typeof parsed === 'object' ? parsed : {};
+        } catch (error) {
+            return {};
+        }
     }
 
     function emptyFilters() {
@@ -42,10 +38,11 @@
 
     function cloneFilters(filters) {
         filters = filters || {};
+
         return {
-            search: String(filters.search || ''),
-            category: String(filters.category || ''),
-            beneficiary: String(filters.beneficiary || '')
+            search: String(filters.search || '').trim(),
+            category: String(filters.category || '').trim(),
+            beneficiary: String(filters.beneficiary || '').trim()
         };
     }
 
@@ -53,71 +50,90 @@
         if (!form) {
             return emptyFilters();
         }
+
         var search = form.querySelector('[data-fellowship-filter-search]');
         var category = form.querySelector('[data-fellowship-filter-category]');
         var beneficiary = form.querySelector('[data-fellowship-filter-beneficiary]');
 
-        return {
+        return cloneFilters({
             search: search ? search.value : '',
             category: category ? category.value : '',
             beneficiary: beneficiary ? beneficiary.value : ''
-        };
+        });
     }
 
     function writeFilters(form, filters) {
-        filters = cloneFilters(filters);
         if (!form) {
             return;
         }
+
+        filters = cloneFilters(filters);
+
         var search = form.querySelector('[data-fellowship-filter-search]');
         var category = form.querySelector('[data-fellowship-filter-category]');
         var beneficiary = form.querySelector('[data-fellowship-filter-beneficiary]');
+
         if (search) { search.value = filters.search; }
         if (category) { category.value = filters.category; }
         if (beneficiary) { beneficiary.value = filters.beneficiary; }
     }
 
-    function serverKey(status, filters) {
-        filters = cloneFilters(filters);
-        return [status, filters.category].join('|');
-    }
-
     function setFilterStatus(form, message) {
-        if (!form) { return; }
+        if (!form) {
+            return;
+        }
+
         var live = form.querySelector('[data-fellowship-filter-status]');
-        if (live) { live.textContent = message || ''; }
+
+        if (live) {
+            live.textContent = message || '';
+        }
     }
 
     function applyClientFilters(content, filters) {
         var list = content.querySelector('.cimne-fellowship-list');
-        if (!list) { return; }
+
+        if (!list) {
+            return;
+        }
 
         filters = cloneFilters(filters);
+
         var oldEmpty = list.querySelector('[data-client-filter-empty]');
-        if (oldEmpty) { oldEmpty.remove(); }
+        if (oldEmpty) {
+            oldEmpty.remove();
+        }
 
         var search = normalizeText(filters.search);
+        var category = filters.category;
         var beneficiary = filters.beneficiary;
         var items = Array.prototype.slice.call(list.querySelectorAll('.cimne-fellowship-list__item'));
         var visible = 0;
 
         items.forEach(function (item) {
             var haystack = normalizeText(item.getAttribute('data-fellowship-search') || '');
+            var itemCategory = item.getAttribute('data-fellowship-category') || '';
             var ids = (item.getAttribute('data-fellowship-beneficiary-ids') || '')
                 .split(',')
                 .map(function (value) { return value.trim(); })
                 .filter(Boolean);
 
             var matchesSearch = !search || haystack.indexOf(search) !== -1;
+            var matchesCategory = !category || itemCategory === category;
             var matchesBeneficiary = !beneficiary || ids.indexOf(beneficiary) !== -1;
-            var show = matchesSearch && matchesBeneficiary;
+            var show = matchesSearch && matchesCategory && matchesBeneficiary;
+
             item.hidden = !show;
-            if (show) { visible += 1; }
+
+            if (show) {
+                visible += 1;
+            }
         });
 
         Array.prototype.slice.call(list.querySelectorAll('.cimne-fellowship-list__group')).forEach(function (group) {
             var anyVisible = Array.prototype.slice.call(group.querySelectorAll('.cimne-fellowship-list__item'))
                 .some(function (item) { return !item.hidden; });
+
             group.hidden = !anyVisible;
         });
 
@@ -130,36 +146,54 @@
         }
     }
 
-    function init(component) {
-        if (component.getAttribute('data-cimne-fellowships-initialized') === '1') { return; }
-        component.setAttribute('data-cimne-fellowships-initialized', '1');
+    function addKeyboardActivation(control, callback) {
+        if (!control) {
+            return;
+        }
 
-        var listUrl = component.getAttribute('data-list-url') || '';
-        var detailUrl = component.getAttribute('data-detail-url') || '';
+        control.addEventListener('keydown', function (event) {
+            if (event.key !== 'Enter' && event.key !== ' ') {
+                return;
+            }
+
+            event.preventDefault();
+            callback();
+        });
+    }
+
+    function init(component) {
+        if (component.getAttribute('data-cimne-fellowships-initialized') === '1') {
+            return;
+        }
+
         var content = component.querySelector('[data-fellowship-content]');
         var notice = component.querySelector('[data-fellowship-notice]');
         var form = document.querySelector('[data-cimne-fellowship-filters]');
         var tabs = Array.prototype.slice.call(component.querySelectorAll('[data-fellowship-status]'));
-        var listCache = {};
-        var detailCache = {};
+        var lists = parseJsonScript(component, '[data-fellowship-preloaded-lists]');
+        var details = parseJsonScript(component, '[data-fellowship-preloaded-details]');
         var activeStatus = 'ongoing';
         var appliedFilters = emptyFilters();
         var returnStatus = activeStatus;
         var returnFilters = emptyFilters();
 
-        if (!listUrl || !detailUrl || !content) { return; }
-
-        listCache[serverKey('ongoing', emptyFilters())] = content.innerHTML;
-
-        function setNotice(message, isError) {
-            if (!notice) { return; }
-            notice.textContent = message || '';
-            notice.classList.toggle('is-error', !!isError);
+        if (
+            !content
+            || !Object.prototype.hasOwnProperty.call(lists, 'ongoing')
+            || !Object.prototype.hasOwnProperty.call(lists, 'finished')
+        ) {
+            return;
         }
 
-        function setLoading(loading) {
-            component.classList.toggle('is-loading', !!loading);
-            content.setAttribute('aria-busy', loading ? 'true' : 'false');
+        component.setAttribute('data-cimne-fellowships-initialized', '1');
+
+        function setNotice(message, isError) {
+            if (!notice) {
+                return;
+            }
+
+            notice.textContent = message || '';
+            notice.classList.toggle('is-error', !!isError);
         }
 
         function setTabs(status) {
@@ -170,70 +204,39 @@
             });
         }
 
-        function loadList(status, filters) {
-            status = status === 'finished' ? 'finished' : 'ongoing';
-            filters = cloneFilters(filters);
-            var key = serverKey(status, filters);
-
-            if (Object.prototype.hasOwnProperty.call(listCache, key)) {
-                return Promise.resolve(listCache[key]);
-            }
-
-            setLoading(true);
-            setNotice('');
-
-            return requestJson(listUrl, {
-                status: status,
-                category: filters.category
-            }).then(function (data) {
-                listCache[key] = data.html || '';
-                return listCache[key];
-            }).finally(function () {
-                setLoading(false);
-            });
-        }
-
         function showList(status, filters) {
             status = status === 'finished' ? 'finished' : 'ongoing';
             filters = cloneFilters(filters);
 
-            return loadList(status, filters).then(function (html) {
-                activeStatus = status;
-                appliedFilters = cloneFilters(filters);
-                returnStatus = status;
-                returnFilters = cloneFilters(filters);
-                content.innerHTML = html;
-                applyClientFilters(content, appliedFilters);
-                setTabs(status);
-                setNotice('');
-            }).catch(function () {
-                setNotice(t('loadFellowshipsError', 'Unable to load fellowships.'), true);
-            });
+            activeStatus = status;
+            appliedFilters = cloneFilters(filters);
+            returnStatus = status;
+            returnFilters = cloneFilters(filters);
+            content.innerHTML = lists[status] || '';
+            applyClientFilters(content, appliedFilters);
+            setTabs(status);
+            setNotice('');
+
+            return Promise.resolve();
         }
 
         function showDetail(code) {
             code = String(code || '').trim();
-            if (!code) { return Promise.resolve(); }
+
+            if (!code) {
+                return;
+            }
 
             returnStatus = activeStatus;
             returnFilters = cloneFilters(appliedFilters);
 
-            if (Object.prototype.hasOwnProperty.call(detailCache, code)) {
-                content.innerHTML = detailCache[code];
-                return Promise.resolve();
+            if (!Object.prototype.hasOwnProperty.call(details, code)) {
+                setNotice(t('loadFellowshipDetailError', 'Unable to load fellowship details.'), true);
+                return;
             }
 
-            setLoading(true);
+            content.innerHTML = details[code];
             setNotice('');
-
-            return requestJson(detailUrl, { fellowship: code }).then(function (data) {
-                detailCache[code] = data.html || '';
-                content.innerHTML = detailCache[code];
-            }).catch(function () {
-                setNotice(t('loadFellowshipDetailError', 'Unable to load fellowship details.'), true);
-            }).finally(function () {
-                setLoading(false);
-            });
         }
 
         tabs.forEach(function (tab) {
@@ -244,6 +247,7 @@
 
         content.addEventListener('click', function (event) {
             var open = event.target.closest('[data-open-fellowship]');
+
             if (open) {
                 event.preventDefault();
                 showDetail(open.getAttribute('data-open-fellowship'));
@@ -251,6 +255,7 @@
             }
 
             var back = event.target.closest('[data-fellowship-back]');
+
             if (back) {
                 event.preventDefault();
                 showList(returnStatus, returnFilters);
@@ -263,6 +268,7 @@
 
             function applyForm() {
                 var filters = readFilters(form);
+
                 showList(activeStatus, filters).then(function () {
                     setFilterStatus(form, t('filtersApplied', 'Filters applied.'));
                 });
@@ -270,6 +276,7 @@
 
             function clearForm() {
                 var filters = emptyFilters();
+
                 writeFilters(form, filters);
                 showList(activeStatus, filters).then(function () {
                     setFilterStatus(form, t('filtersCleared', 'Filters cleared.'));
@@ -283,24 +290,17 @@
 
             if (apply) {
                 apply.addEventListener('click', applyForm);
-                apply.addEventListener('keydown', function (event) {
-                    if (event.key === 'Enter' || event.key === ' ') {
-                        event.preventDefault();
-                        applyForm();
-                    }
-                });
+                addKeyboardActivation(apply, applyForm);
             }
 
             if (refresh) {
                 refresh.addEventListener('click', clearForm);
-                refresh.addEventListener('keydown', function (event) {
-                    if (event.key === 'Enter' || event.key === ' ') {
-                        event.preventDefault();
-                        clearForm();
-                    }
-                });
+                addKeyboardActivation(refresh, clearForm);
             }
         }
+
+        applyClientFilters(content, appliedFilters);
+        setTabs(activeStatus);
     }
 
     document.addEventListener('DOMContentLoaded', function () {

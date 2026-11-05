@@ -150,6 +150,7 @@ function cimne_normalize_fellowship_list_item( array $fellowship ) {
         'start_date'        => cimne_api_value( $fellowship, array( 'fecha_comienzo' ) ),
         'end_date'          => cimne_api_value( $fellowship, array( 'fecha_fin', 'fecha_finalizacion' ) ),
         'category'          => trim( (string) cimne_api_value( $fellowship, array( 'naturaleza_proyecto_descripcion' ), '' ) ),
+        'status_code'       => strtoupper( trim( (string) cimne_api_value( $fellowship, array( 'estado_actual_codigo' ), '' ) ) ),
         'funding_bodies'    => cimne_fellowship_stakeholder_names_by_type( $stakeholders, 'FIN' ),
         'beneficiaries'     => $beneficiaries,
         'beneficiary_ids'   => array_values(
@@ -261,6 +262,41 @@ function cimne_normalize_fellowship_detail_payload( array $payload, $resource = 
     }
 
     return $normalized;
+}
+
+/**
+ * Reduces the complete A/C/F Fellowships payload used by the Awards page.
+ *
+ * List and detail representations are cached together so all browser
+ * interactions can be resolved without additional REST/API calls.
+ *
+ * @param array  $payload  Raw API list.
+ * @param string $resource Resource name.
+ * @param array  $params   Query params.
+ * @return array
+ */
+function cimne_normalize_fellowship_collection_payload( array $payload, $resource = '', array $params = array() ) {
+    $collection = array();
+
+    foreach ( $payload as $fellowship ) {
+        if ( ! is_array( $fellowship ) || ! cimne_fellowship_is_public( $fellowship ) ) {
+            continue;
+        }
+
+        $list = cimne_normalize_fellowship_list_item( $fellowship );
+
+        if ( empty( $list['code'] ) ) {
+            continue;
+        }
+
+        $collection[] = array(
+            'status_code' => isset( $list['status_code'] ) ? (string) $list['status_code'] : '',
+            'list'        => $list,
+            'detail'      => cimne_normalize_fellowship_detail_item( $fellowship ),
+        );
+    }
+
+    return $collection;
 }
 
 /**

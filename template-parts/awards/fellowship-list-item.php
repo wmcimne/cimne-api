@@ -16,6 +16,7 @@ $end_date    = isset( $fellowship['end_date'] ) ? (string) $fellowship['end_date
 $funders     = isset( $fellowship['funding_bodies'] ) && is_array( $fellowship['funding_bodies'] ) ? $fellowship['funding_bodies'] : array();
 $names       = isset( $fellowship['beneficiary_names'] ) && is_array( $fellowship['beneficiary_names'] ) ? $fellowship['beneficiary_names'] : array();
 $ids         = isset( $fellowship['beneficiary_ids'] ) && is_array( $fellowship['beneficiary_ids'] ) ? $fellowship['beneficiary_ids'] : array();
+$category    = isset( $fellowship['category'] ) ? trim( (string) $fellowship['category'] ) : '';
 $search_text = trim( $acronym . ' ' . $title . ' ' . implode( ' ', $names ) );
 $ids_attr    = implode( ',', array_map( 'strval', $ids ) );
 
@@ -23,7 +24,7 @@ if ( '' === $code ) {
     return;
 }
 ?>
-<article class="cimne-fellowship-list__item" data-fellowship-search="<?php echo esc_attr( $search_text ); ?>" data-fellowship-beneficiary-ids="<?php echo esc_attr( $ids_attr ); ?>">
+<article class="cimne-fellowship-list__item" data-fellowship-search="<?php echo esc_attr( $search_text ); ?>" data-fellowship-category="<?php echo esc_attr( $category ); ?>" data-fellowship-beneficiary-ids="<?php echo esc_attr( $ids_attr ); ?>">
     <div class="cimne-fellowship-list__body">
         <button type="button" class="cimne-fellowship-list__open" data-open-fellowship="<?php echo esc_attr( $code ); ?>" aria-label="<?php echo esc_attr( sprintf( __( 'Open fellowship %s', 'cimne' ), '' !== $acronym ? $acronym : $title ) ); ?>">
             <?php if ( '' !== $acronym ) : ?>

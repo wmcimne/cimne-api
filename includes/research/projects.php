@@ -4,9 +4,9 @@
  * - Cluster / Research Group pages: [cimne_research_projects]
  * - Global Projects page: [cimne_projects]
  *
- * The initial Ongoing list is server-rendered. Finished lists and project
- * details are loaded through the CIMNE WordPress REST routes defined in
- * rest.php.
+ * Cluster / Research Group pages keep the existing REST-assisted flow.
+ * The global Projects page preloads the complete A/C/F collection in PHP and
+ * performs status changes, filtering and detail navigation entirely in JS.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -343,6 +343,199 @@ function cimne_global_get_project_list( $status = 'ongoing', array $filters = ar
 }
 
 /**
+ * Gets the complete reduced A/C/F collection for the global Projects page.
+ *
+ * The API is called once per cache lifecycle. Both list and detail shapes are
+ * stored in the same transformed cache entry so the browser never needs a
+ * second request for Finished, filters or project details.
+ *
+ * @return array|WP_Error
+ */
+function cimne_global_get_project_collection() {
+    static $loaded = false;
+    static $collection;
+
+    if ( $loaded ) {
+        return $collection;
+    }
+
+    $loaded = true;
+    $collection = cimne_api_get(
+        'projects',
+        array(
+            'estado_actual_codigo' => 'A,C,F',
+        ),
+        array(
+            'cache_variant' => 'project-global-collection-v1',
+            'transform'     => 'cimne_normalize_project_collection_payload',
+        )
+    );
+
+    return $collection;
+}
+
+/**
+ * Gets all normalized Research Units required to reproduce the API IU
+ * hierarchy in browser-side filtering.
+ *
+ * @return array|WP_Error
+ */
+function cimne_projects_get_global_units() {
+    static $loaded = false;
+    static $units;
+
+    if ( $loaded ) {
+        return $units;
+    }
+
+    $loaded = true;
+    $response = cimne_api_get( 'research_units' );
+
+    if ( is_wp_error( $response ) ) {
+        $units = $response;
+        return $units;
+    }
+
+    $units = cimne_normalize_research_units( $response );
+
+    return $units;
+}
+
+/**
+ * Builds a lookup of unit code => self + all known ancestor codes.
+ *
+ * @param array $units Normalized research units.
+ * @return array<string,array<int,string>>
+ */
+function cimne_projects_build_unit_ancestry_map( array $units ) {
+    $parents = array();
+
+    foreach ( $units as $unit ) {
+        if ( ! is_array( $unit ) ) {
+            continue;
+        }
+
+        $code = isset( $unit['code'] ) ? trim( (string) $unit['code'] ) : '';
+
+        if ( '' === $code ) {
+            continue;
+        }
+
+        $raw_parents = isset( $unit['parent_codes'] ) && is_array( $unit['parent_codes'] )
+            ? $unit['parent_codes']
+            : array();
+
+        $parents[ $code ] = array_values(
+            array_unique(
+                array_filter(
+                    array_map(
+                        static function ( $value ) {
+                            return trim( (string) $value );
+                        },
+                        $raw_parents
+                    )
+                )
+            )
+        );
+    }
+
+    $resolved = array();
+
+    $resolve = static function ( $code, array $trail = array() ) use ( &$resolve, &$resolved, $parents ) {
+        $code = trim( (string) $code );
+
+        if ( '' === $code ) {
+            return array();
+        }
+
+        if ( isset( $resolved[ $code ] ) ) {
+            return $resolved[ $code ];
+        }
+
+        if ( isset( $trail[ $code ] ) ) {
+            return array( $code );
+        }
+
+        $trail[ $code ] = true;
+        $codes          = array( $code );
+
+        foreach ( isset( $parents[ $code ] ) ? $parents[ $code ] : array() as $parent_code ) {
+            $codes = array_merge( $codes, $resolve( $parent_code, $trail ) );
+        }
+
+        $resolved[ $code ] = array_values( array_unique( array_filter( $codes ) ) );
+
+        return $resolved[ $code ];
+    };
+
+    foreach ( array_keys( $parents ) as $code ) {
+        $resolve( $code );
+    }
+
+    return $resolved;
+}
+
+/**
+ * Splits the global collection into pre-rendered Ongoing/Finished lists and a
+ * pre-rendered detail HTML cache.
+ *
+ * @param array $collection Reduced global project collection.
+ * @param array $units      Normalized research units.
+ * @return array
+ */
+function cimne_projects_prepare_global_collection( array $collection, array $units = array() ) {
+    $ancestry = cimne_projects_build_unit_ancestry_map( $units );
+    $ongoing  = array();
+    $finished = array();
+    $details  = array();
+
+    foreach ( $collection as $entry ) {
+        if ( ! is_array( $entry ) || empty( $entry['list'] ) || ! is_array( $entry['list'] ) ) {
+            continue;
+        }
+
+        $list = $entry['list'];
+        $code = isset( $list['code'] ) ? trim( (string) $list['code'] ) : '';
+
+        if ( '' === $code ) {
+            continue;
+        }
+
+        $department_code = isset( $entry['department_code'] )
+            ? trim( (string) $entry['department_code'] )
+            : '';
+
+        if ( '' !== $department_code ) {
+            $list['unit_codes'] = isset( $ancestry[ $department_code ] )
+                ? $ancestry[ $department_code ]
+                : array( $department_code );
+        } else {
+            $list['unit_codes'] = array();
+        }
+
+        $status_code = isset( $entry['status_code'] )
+            ? strtoupper( trim( (string) $entry['status_code'] ) )
+            : '';
+
+        if ( 'A' === $status_code ) {
+            $ongoing[] = $list;
+        } elseif ( in_array( $status_code, array( 'C', 'F' ), true ) ) {
+            $finished[] = $list;
+        }
+
+        if ( ! empty( $entry['detail'] ) && is_array( $entry['detail'] ) ) {
+            $details[ $code ] = cimne_research_render_project_detail( $entry['detail'] );
+        }
+    }
+
+    return array(
+        'ongoing' => $ongoing,
+        'finished' => $finished,
+        'details' => $details,
+    );
+}
+
+/**
  * Gets one reduced project detail.
  *
  * Research context keeps the unit scope in the request. Global context only
@@ -519,11 +712,23 @@ function cimne_research_get_projects_context( $code ) {
  * @return array|WP_Error
  */
 function cimne_global_get_projects_context() {
-    $projects = cimne_global_get_project_list( 'ongoing' );
+    $collection = cimne_global_get_project_collection();
 
-    if ( is_wp_error( $projects ) ) {
-        return $projects;
+    if ( is_wp_error( $collection ) ) {
+        return $collection;
     }
+
+    $units = cimne_projects_get_global_units();
+
+    if ( is_wp_error( $units ) ) {
+        cimne_api_log(
+            'Global Projects unit hierarchy unavailable; unit filter metadata will be reduced.',
+            array( 'error_code' => $units->get_error_code() )
+        );
+        $units = array();
+    }
+
+    $prepared = cimne_projects_prepare_global_collection( $collection, $units );
 
     return array(
         'project_context'    => 'global',
@@ -531,7 +736,9 @@ function cimne_global_get_projects_context() {
         'is_cluster'         => false,
         'projects_page_url'  => cimne_projects_get_public_page_url( 'global' ),
         'project_card_url'   => cimne_projects_get_project_card_page_url(),
-        'ongoing_html'       => cimne_research_render_project_list( $projects, 'ongoing' ),
+        'ongoing_html'       => cimne_research_render_project_list( $prepared['ongoing'], 'ongoing' ),
+        'finished_html'      => cimne_research_render_project_list( $prepared['finished'], 'finished' ),
+        'detail_html'        => $prepared['details'],
     );
 }
 
